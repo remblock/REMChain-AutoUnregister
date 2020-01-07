@@ -86,7 +86,6 @@ then
 else
   read -p "ENTER YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
-  echo "owner=$owneraccountname" >> "$backup_unregister_script_path"
   echo ""
 fi
 
@@ -100,7 +99,6 @@ then
 else
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
-  echo "walletpass=$walletpass" >> "$backup_unregister_script_path"
   echo ""
 fi
 
@@ -115,7 +113,6 @@ then
 else
   read -p "ENTER YOUR KEY PERMISSION: " -e producerpermission
   echo "producerpermission=$producerpermission" >> "$config_file"
-  echo "producerpermission=$producerpermission" >> "$backup_unregister_script_path"
   echo ""
 fi
 
@@ -223,22 +220,28 @@ function check_produce_minutes() {
     #Check if the recover script is already running before starting it again
     if ! pgrep 'bp-unregister' &> /dev/null
     then  
-      bash "$backup_unregister_script_path"
+      export owneraccountname
+      export walletpass
+      export producerpermission
+      bash "$backup_unregister_script_path" &>/dev/null
       send_telegram_messages "Auto-Unregister script has executed"
     fi
   fi
 }
 
 #-----------------------------------------------------------------------------------------------------
+# MAIN PART
+#-----------------------------------------------------------------------------------------------------
 
-if [ ! -f "$create_dir/last_send_message_epoch.txt" ]
+if [ ! -f "$create_dir/last_check_epoch.txt" ]
 then
-  echo $now_epoch > "$create_dir/last_send_message_epoch.txt"
+  echo $now_epoch > "$create_dir/last_check_epoch.txt"
 else
   config_minutes_in_seconds="$((check_threshold * 60))"
-  last_msg_epoch=$(cat "$create_dir/last_send_message_epoch.txt")
-  if (( (now_epoch - last_msg_epoch) >= config_minutes_in_seconds ))
+  last_check_epoch=$(cat "$create_dir/last_check_epoch.txt")
+  if (( ($now_epoch - $last_check_epoch) >= $config_minutes_in_seconds ))
   then
+    echo $now_epoch > "$create_dir/last_check_epoch.txt"
     check_produce_minutes
   fi
 fi
