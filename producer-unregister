@@ -165,10 +165,10 @@ fi
 
 if get_config_value walletpass
 then
-  walletpassword="$global_value"
+  walletpass="$global_value"
 else
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
-  echo "walletpassword=$walletpassword" >> "$config_file"
+  echo "walletpass=$walletpass" >> "$config_file"
   echo
 fi
 
