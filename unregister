@@ -93,7 +93,7 @@ fi
 # GET VALUE FROM THE CONFIG FILE, RETURN IT WITH THE VARIABLE "global_value"
 #-----------------------------------------------------------------------------------------------------
 
-function get_config_value(){
+function get_config_value() {
   global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
   if [ -z "$global_value" ]
   then
@@ -107,7 +107,7 @@ function get_config_value(){
 # SEND THE STRING PARAMETER TO TELEGRAM
 #-----------------------------------------------------------------------------------------------------
 
-function send_telegram_messages(){
+function send_telegram_messages() {
   if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
   then
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$1" &>/dev/null
@@ -118,7 +118,7 @@ function send_telegram_messages(){
 # TRANSLATE THE TIME FORMAT FROM REMCLI FORMATE TO EPOCH TIME
 #-----------------------------------------------------------------------------------------------------
 
-function remnodelogtime_to_epoch(){
+function remnodelogtime_to_epoch() {
   temp_date="$( echo $1 | awk -F '.' '{ print $1}' | tr '-' '/' | tr 'T' ' ')"
   echo $(date "+%s" -d "$temp_date")
 }
@@ -127,7 +127,7 @@ function remnodelogtime_to_epoch(){
 # FUNCTION THAT CHECKS IF WHETHER THE NODE HAS ACTUAL PRODUCED A BLOCK WITHIN THE CONFIGURED MINUTES
 #-----------------------------------------------------------------------------------------------------
 
-function check_produce_minutes(){
+function check_produce_minutes() {
   last_block_date=$(remcli get table rem rem producers -L $owneraccountname -U $owneraccountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
