@@ -1,0 +1,233 @@
+#!/bin/bash
+
+#****************************************************************************************************#
+#                                          AUTO UNREGISTER                                           #
+#****************************************************************************************************#
+
+#-----------------------------------------------------------------------------------------------------
+# SCRIPT MADE TO RUN BY CRON EVERY MINUTE
+#-----------------------------------------------------------------------------------------------------
+
+if (($EUID!=0))
+then
+  echo "You must be root to run this script" 2>&1
+  exit 1
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# CONFIGURATION VARIABLES
+#-----------------------------------------------------------------------------------------------------
+
+config_file="/root/remblock/auto-unregister/config"
+backup_failover_script_path="/root/remblock/auto-unregister/bp-unregister"
+create_dir="/root/remblock/auto-unregister"
+#PATH to used commands
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+cron_cmd="/root/remblock/auto-unregister/unregister"
+now_epoch="$(date +%s)"
+
+#-----------------------------------------------------------------------------------------------------
+# CREATE DIRECTORY IF IT DOESN'T EXIST
+#-----------------------------------------------------------------------------------------------------
+
+if [ ! -d "$create_dir" ]
+then
+  mkdir -p "$create_dir"
+  cp -p "$0" "$create_dir"
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# CREATE CONFIG FILE IF IT DOESN'T EXIST
+#-----------------------------------------------------------------------------------------------------
+
+if [ ! -f "$config_file" ]
+then
+  echo "#Configuration file for the unregister script" > "$config_file"
+  echo "#Make the entries as variable=value" >> "$config_file"
+  echo 'bpm_check_produce_minutes=5' >> "$config_file"
+  echo 'producer_config_changed=false' >> "$config_file"
+  echo 'check_threshold=60' >> "$config_file"
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# INSTALL CRONTAB LINE IF IT DOESN'T EXIST
+#-----------------------------------------------------------------------------------------------------
+
+if [ ! -z "$cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$cron_cmd" &>/dev/null
+then
+  (crontab -u root -l ; echo "*/1 * * * * $cron_cmd") | crontab -u root -
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# CREATES THE BACKUP UNREGISTER SCRIPT IF IT DOESN' EXIST
+#-----------------------------------------------------------------------------------------------------
+
+if [ ! -f "$backup_unregister_script_path" ]
+then
+cat > "$backup_unregister_script_path" << 'DOC'
+#!/usr/bin/env bash
+
+#-----------------------------------------------------------------------------------------------------
+# INITIATE BOOLEAN VARIABLES FOR THE UNREGISTER SCRIPT
+#-----------------------------------------------------------------------------------------------------
+
+owneraccountname=nhpyodzbxdeo
+walletpass=PW5KT3adWcGiznQS8aQg3mbhCzDcuhavbVCGrdg2ZmY8GGPhuh6Nk
+producerpermission=owner
+
+#-----------------------------------------------------------------------------------------------------
+# UNREGISTER AS A BLOCK PRODUCER
+#-----------------------------------------------------------------------------------------------------
+
+remcli wallet unlock --password $walletpass 2>&1
+remcli system unregprod $owneraccountname -p $owneraccountname@$producerpermission
+DOC
+  chmod u+x "$backup_unregister_script_path"
+fi
+
+#****************************************************************************************************#
+#                                       FUNCTIONS DEFINITIONS                                        #
+#****************************************************************************************************#
+
+#-----------------------------------------------------------------------------------------------------
+# GET VALUE FROM THE CONFIG FILE, RETURN IT WITH THE VARIABLE "global_value"
+#-----------------------------------------------------------------------------------------------------
+
+function get_config_value(){
+  global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
+  if [ -z "$global_value" ]
+  then
+    return 1
+  else
+    return 0
+  fi
+}
+
+#-----------------------------------------------------------------------------------------------------
+# SEND THE STRING PARAMETER TO TELEGRAM
+#-----------------------------------------------------------------------------------------------------
+
+function send_telegram_messages(){
+  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
+  then
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$1" &>/dev/null
+  fi
+}
+
+#-----------------------------------------------------------------------------------------------------
+# TRANSLATE THE TIME FORMAT FROM REMCLI FORMATE TO EPOCH TIME
+#-----------------------------------------------------------------------------------------------------
+
+function remnodelogtime_to_epoch(){
+  temp_date="$( echo $1 | awk -F '.' '{ print $1}' | tr '-' '/' | tr 'T' ' ')"
+  echo $(date "+%s" -d "$temp_date")
+}
+
+#-----------------------------------------------------------------------------------------------------
+# FUNCTION THAT CHECKS IF WHETHER THE NODE HAS ACTUAL PRODUCED A BLOCK WITHIN THE CONFIGURED MINUTES
+#-----------------------------------------------------------------------------------------------------
+
+function check_produce_minutes(){
+  last_block_date=$(remcli get table rem rem producers -L $owneraccountname -U $owneraccountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+  config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
+  if (( (now_epoch - last_block_epoch) >= config_minutes_in_seconds ))
+  then
+    #Check if the recover script is already running before starting it again
+    if ! pgrep 'bp-unregister' &> /dev/null
+    then  
+      bash "$backup_unregister_script_path"
+      send_telegram_messages "Auto-Unregister script has executed"
+    fi
+  fi
+}
+
+#****************************************************************************************************#
+#                                   GETTING POSSIBLE MISSING VALUE                                   #
+#****************************************************************************************************#
+
+#-----------------------------------------------------------------------------------------------------
+# GET PRODUCER NAME IF NOT ALREADY ON THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value owner
+then
+  owneraccountname="$global_value"
+else
+  read -p "ENTER YOUR ACCOUNT NAME: " -e owneraccountname
+  echo "owner=$owneraccountname" >> "$config_file"
+  echo
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET WALLET PASSWORD IF NOT ALREADY ON THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value walletpassword
+then
+  walletpassword="$global_value"
+else
+  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpassword
+  echo "walletpassword=$walletpassword" >> "$config_file"
+  echo
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET TELEGRAM DATA IF NOT ALREADY ON THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value telegram_token
+then
+  telegram_token="$global_value"
+else
+  read -p "ENTER YOUR TELEGRAM TOKEN: " -e telegram_token
+  echo "telegram_token=$telegram_token" >> "$config_file"
+  echo
+fi
+
+if get_config_value telegram_chatid
+then
+  telegram_chatid="$global_value"
+else
+  read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+  echo "telegram_chatid=$telegram_chatid" >> "$config_file"
+  echo 
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET THE MINUTES IF NOT ALREADY ON THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value check_threshold 
+then
+  check_threshold="$global_value"
+else
+  read -p "NOTIFCATION THRESHOLD IN MINUTES: " -e check_threshold
+  echo "check_threshold=$check_threshold" >> "$config_file"
+  echo 
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET BP MONITOR REMNODE VALUES IF NOT SET IN THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value bpm_check_produce_minutes
+then
+  bpm_check_produce_minutes="$global_value"
+else
+  read -p "ENTER THE NUMBER OF MINTUES YOU WANT TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e bpm_check_produce_minutes
+  echo "bpm_check_produce_minutes=$bpm_check_produce_minutes" >> "$config_file"
+  echo 
+fi
+
+if [ ! -f "$create_dir/last_send_message_epoch.txt" ]
+then
+  echo $now_epoch > "$create_dir/last_send_message_epoch.txt"
+else
+  config_minutes_in_seconds="$((check_threshold * 60))"
+  last_msg_epoch=$(cat "$create_dir/last_send_message_epoch.txt")
+  if (( (now_epoch - last_msg_epoch) >= config_minutes_in_seconds ))
+  then
+    check_produce_minutes
+  fi
+fi
