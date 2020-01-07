@@ -149,6 +149,7 @@ else
   read -p "ENTER YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
   echo "owner=$owneraccountname" >> "$backup_unregister_script_path"
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -162,6 +163,7 @@ else
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
   echo "walletpass=$walletpass" >> "$backup_unregister_script_path"
+  echo
 fi
 
 
@@ -176,6 +178,7 @@ else
   read -p "ENTER YOUR KEY PERMISSION: " -e producerpermission
   echo "producerpermission=$producerpermission" >> "$config_file"
   echo "producerpermission=$producerpermission" >> "$backup_unregister_script_path"
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
