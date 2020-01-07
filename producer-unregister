@@ -68,14 +68,6 @@ cat > "$backup_unregister_script_path" << 'DOC'
 #!/usr/bin/env bash
 
 #-----------------------------------------------------------------------------------------------------
-# INITIATE BOOLEAN VARIABLES FOR THE UNREGISTER SCRIPT
-#-----------------------------------------------------------------------------------------------------
-
-owneraccountname=
-walletpass=
-producerpermission=owner
-
-#-----------------------------------------------------------------------------------------------------
 # UNREGISTER AS A BLOCK PRODUCER
 #-----------------------------------------------------------------------------------------------------
 
@@ -156,7 +148,7 @@ then
 else
   read -p "ENTER YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
-  echo
+  echo "owner=$owneraccountname" >> "$backup_unregister_script_path"
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -169,7 +161,21 @@ then
 else
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
-  echo
+  echo "walletpass=$walletpass" >> "$backup_unregister_script_path"
+fi
+
+
+#-----------------------------------------------------------------------------------------------------
+# GET PERMISSION IF NOT ALREADY ON THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value producerpermission
+then
+  producerpermission="$global_value"
+else
+  read -p "ENTER YOUR KEY PERMISSION: " -e producerpermission
+  echo "producerpermission=$producerpermission" >> "$config_file"
+  echo "producerpermission=$producerpermission" >> "$backup_unregister_script_path"
 fi
 
 #-----------------------------------------------------------------------------------------------------
