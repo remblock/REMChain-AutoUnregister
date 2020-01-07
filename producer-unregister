@@ -71,8 +71,8 @@ cat > "$backup_unregister_script_path" << 'DOC'
 # INITIATE BOOLEAN VARIABLES FOR THE UNREGISTER SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
-owneraccountname=nhpyodzbxdeo
-walletpass=PW5KT3adWcGiznQS8aQg3mbhCzDcuhavbVCGrdg2ZmY8GGPhuh6Nk
+owneraccountname=
+walletpass=
 producerpermission=owner
 
 #-----------------------------------------------------------------------------------------------------
