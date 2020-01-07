@@ -23,7 +23,7 @@ backup_failover_script_path="/root/remblock/auto-unregister/bp-unregister"
 create_dir="/root/remblock/auto-unregister"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-cron_cmd="/root/remblock/auto-unregister/unregister"
+cron_cmd="/root/remblock/auto-unregister/producer-unregister"
 now_epoch="$(date +%s)"
 
 #-----------------------------------------------------------------------------------------------------
