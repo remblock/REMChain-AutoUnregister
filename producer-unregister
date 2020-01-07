@@ -149,7 +149,7 @@ else
   read -p "ENTER YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
   echo "owner=$owneraccountname" >> "$backup_unregister_script_path"
-  echo
+  echo ""
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ else
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
   echo "walletpass=$walletpass" >> "$backup_unregister_script_path"
-  echo
+  echo ""
 fi
 
 
@@ -178,7 +178,7 @@ else
   read -p "ENTER YOUR KEY PERMISSION: " -e producerpermission
   echo "producerpermission=$producerpermission" >> "$config_file"
   echo "producerpermission=$producerpermission" >> "$backup_unregister_script_path"
-  echo
+  echo ""
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ then
 else
   read -p "ENTER YOUR TELEGRAM TOKEN: " -e telegram_token
   echo "telegram_token=$telegram_token" >> "$config_file"
-  echo
+  echo ""
 fi
 
 if get_config_value telegram_chatid
@@ -200,7 +200,7 @@ then
 else
   read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
   echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-  echo 
+  echo ""
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ then
 else
   read -p "NOTIFCATION THRESHOLD IN MINUTES: " -e check_threshold
   echo "check_threshold=$check_threshold" >> "$config_file"
-  echo 
+  echo ""
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ then
 else
   read -p "ENTER THE NUMBER OF MINTUES YOU WANT TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e bpm_check_produce_minutes
   echo "bpm_check_produce_minutes=$bpm_check_produce_minutes" >> "$config_file"
-  echo 
+  echo ""
 fi
 
 if [ ! -f "$create_dir/last_send_message_epoch.txt" ]
