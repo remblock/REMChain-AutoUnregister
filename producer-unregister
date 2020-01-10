@@ -161,7 +161,7 @@ then
   then
     telegram_token="$global_value"
   else
-    read -p "ENTER YOUR TELEGRAM TOKEN: " -e telegram_token
+    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
     echo ""
   fi
