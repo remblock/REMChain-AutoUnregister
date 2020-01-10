@@ -233,7 +233,7 @@ function remnodelogtime_to_epoch() {
 }
 
 #-----------------------------------------------------------------------------------------------------
-# FUNCTION THAT CHECKS IF WHETHER THE NODE HAS ACTUAL PRODUCED A BLOCK WITHIN THE CONFIGURED MINUTES
+# FUNCTION THAT CHECKS WHETHER THE NODE HAS ACTUAL PRODUCED A BLOCK WITHIN THE CONFIGURED MINUTES
 #-----------------------------------------------------------------------------------------------------
 
 function check_produce_minutes() {
