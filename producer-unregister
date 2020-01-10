@@ -61,12 +61,12 @@ fi
 function get_user_answer_yn(){
   while :
   do
-    read -p "$1 [y/n]: " answer
+    read -p "$1 (Y/N): " answer
     answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
-      *) echo  "Invalid Answer [yes/y/no/n expected]";continue;;
+      *) echo  "Invalid Answer [yes/no/y/n expected]";continue;;
     esac
   done
 }
@@ -142,7 +142,7 @@ then
     telegram_enabled=false
   fi
 else
-  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS (Y/N):"
+  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
     echo "telegram_enabled=true" >> "$config_file"
