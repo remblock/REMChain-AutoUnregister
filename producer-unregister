@@ -44,6 +44,7 @@ if [ ! -f "$config_file" ]
 then
   echo "#Configuration file for the unregister script" > "$config_file"
   echo "#Make the entries as variable=value" >> "$config_file"
+  echo " " >> "$config_file"
   echo 'bpm_check_produce_minutes=12' >> "$config_file"
 fi
 
