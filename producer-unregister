@@ -155,7 +155,7 @@ else
   echo ""
 fi
 
-if get_config_value telegram_enabled
+if $telegram_enabled
 then
   if get_config_value telegram_token
   then
