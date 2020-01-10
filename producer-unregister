@@ -46,7 +46,6 @@ then
   echo "#Make the entries as variable=value" >> "$config_file"
   echo 'bpm_check_produce_minutes=5' >> "$config_file"
   echo 'producer_config_changed=false' >> "$config_file"
-  echo 'check_threshold=60' >> "$config_file"
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -57,6 +56,20 @@ if [ ! -z "$cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$cron_c
 then
   (crontab -u root -l ; echo "*/1 * * * * $cron_cmd") | crontab -u root -
 fi
+
+#Get yes or no answer from user
+function get_user_answer_yn(){
+  while :
+  do
+    read -p "$1 [y/n]: " answer
+    answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"
+    case "$answer" in
+      yes|y) return 0 ;;
+      no|n) return 1 ;;
+      *) echo  "Invalid Answer [yes/y/no/n expected]";continue;;
+    esac
+  done
+}
 
 #-----------------------------------------------------------------------------------------------------
 # GET VALUE FROM THE CONFIG FILE, RETURN IT WITH THE VARIABLE "global_value"
@@ -119,36 +132,44 @@ fi
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM DATA IF NOT ALREADY ON THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-
-if get_config_value telegram_token
+if get_config_value telegram_enabled
 then
-  telegram_token="$global_value"
+  if [ "$global_value" = "true" ]
+  then
+    telegram_enabled=true
+  else
+    telegram_enabled=false
+  fi
 else
-  read -p "ENTER YOUR TELEGRAM TOKEN: " -e telegram_token
-  echo "telegram_token=$telegram_token" >> "$config_file"
+  if get_user_answer_yn "DO YOU WANT TO ENABLE TELEGRAM NOTIFICATIONS"
+  then
+    telegram_enabled=true
+    echo "telegram_enabled=true" >> "$config_file"
+  else
+    echo "telegram_enabled=false" >> "$config_file"
+  fi
   echo ""
 fi
 
-if get_config_value telegram_chatid
+if $telegram_enabled
 then
-  telegram_chatid="$global_value"
-else
-  read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-  echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-  echo ""
-fi
+  if get_config_value telegram_token
+  then
+    telegram_token="$global_value"
+  else
+    read -p "ENTER YOUR TELEGRAM TOKEN: " -e telegram_token
+    echo "telegram_token=$telegram_token" >> "$config_file"
+    echo ""
+  fi
 
-#-----------------------------------------------------------------------------------------------------
-# GET THE MINUTES IF NOT ALREADY ON THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-if get_config_value check_threshold 
-then
-  check_threshold="$global_value"
-else
-  read -p "NOTIFCATION THRESHOLD IN MINUTES: " -e check_threshold
-  echo "check_threshold=$check_threshold" >> "$config_file"
-  echo ""
+  if get_config_value telegram_chatid
+  then
+    telegram_chatid="$global_value"
+  else
+    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+    echo "telegram_chatid=$telegram_chatid" >> "$config_file"
+    echo ""
+  fi
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -192,7 +213,7 @@ fi
 #-----------------------------------------------------------------------------------------------------
 
 function send_telegram_messages() {
-  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
+  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ] && $telegram_enabled
   then
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$1" &>/dev/null
   fi
@@ -218,13 +239,17 @@ function check_produce_minutes() {
   if (( (now_epoch - last_block_epoch) >= config_minutes_in_seconds ))
   then
     #Check if the recover script is already running before starting it again
-    if ! pgrep 'bp-unregister' &> /dev/null
+    if ! pgrep 'bp-unregister' &> /dev/null 
     then  
-      export owneraccountname
-      export walletpass
-      export producerpermission
-      bash "$backup_unregister_script_path" &>/dev/null
-      send_telegram_messages "Auto-Unregister script has executed"
+      #Execute unregister only if it's registered
+      if [ "$(remcli get table rem rem producers -L $owneraccountname -U $owneraccountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
+      then
+        export owneraccountname
+        export walletpass
+        export producerpermission
+        bash "$backup_unregister_script_path" &>/dev/null
+        send_telegram_messages "Auto-Unregister script has executed"
+      fi
     fi
   fi
 }
@@ -237,7 +262,7 @@ if [ ! -f "$create_dir/last_check_epoch.txt" ]
 then
   echo $now_epoch > "$create_dir/last_check_epoch.txt"
 else
-  config_minutes_in_seconds="$((check_threshold * 60))"
+  config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
   last_check_epoch=$(cat "$create_dir/last_check_epoch.txt")
   if (( ($now_epoch - $last_check_epoch) >= $config_minutes_in_seconds ))
   then
