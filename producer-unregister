@@ -141,7 +141,7 @@ then
     telegram_enabled=false
   fi
 else
-  if get_user_answer_yn "DO YOU WANT TO ENABLE TELEGRAM NOTIFICATIONS"
+  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS (Y/N):"
   then
     telegram_enabled=true
     echo "telegram_enabled=true" >> "$config_file"
@@ -180,7 +180,7 @@ if get_config_value bpm_check_produce_minutes
 then
   bpm_check_produce_minutes="$global_value"
 else
-  read -p "ENTER THE NUMBER OF MINTUES YOU WANT TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e bpm_check_produce_minutes
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e bpm_check_produce_minutes
   echo "bpm_check_produce_minutes=$bpm_check_produce_minutes" >> "$config_file"
   echo ""
 fi
