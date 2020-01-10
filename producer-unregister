@@ -96,12 +96,12 @@ function get_config_value() {
 # GET PRODUCER NAME IF NOT ALREADY ON THE CONFIG FILE                                                #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value owner
+if get_config_value accountname
 then
-  owneraccountname="$global_value"
+  accountname="$global_value"
 else
-  read -p "ENTER YOUR ACCOUNT NAME: " -e owneraccountname
-  echo "owner=$owneraccountname" >> "$config_file"
+  read -p "ENTER YOUR ACCOUNT NAME: " -e accountname
+  echo "accountname=$accountname" >> "$config_file"
   echo ""
 fi
 
@@ -203,7 +203,7 @@ cat > "$backup_unregister_script_path" << 'DOC'
 #----------------------------------------------------------------------------------------------------#
 
 remcli wallet unlock --password $walletpass 2>&1
-remcli system unregprod $owneraccountname -p $owneraccountname@$producerpermission
+remcli system unregprod $accountname -p $accountname@$producerpermission
 DOC
   chmod u+x "$backup_unregister_script_path"
 fi
@@ -237,7 +237,7 @@ function remnodelogtime_to_epoch() {
 #----------------------------------------------------------------------------------------------------#
 
 function check_produce_minutes() {
-  last_block_date=$(remcli get table rem rem producers -L $owneraccountname -U $owneraccountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
   if (( (now_epoch - last_block_epoch) >= config_minutes_in_seconds ))
@@ -246,7 +246,7 @@ function check_produce_minutes() {
     if ! pgrep 'bp-unregister' &> /dev/null 
     then  
       #Execute unregister only if it's registered
-      if [ "$(remcli get table rem rem producers -L $owneraccountname -U $owneraccountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
+      if [ "$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
       then
         export owneraccountname
         export walletpass
