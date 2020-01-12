@@ -242,8 +242,8 @@ function check_produce_minutes() {
   if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
   then
     #Check if the recover script is already running before starting it again
-    if ! pgrep 'bp-unregister' &> /dev/null 
-    then  
+    if ! pgrep 'bp-unregister' &> /dev/null
+    then
       #Execute unregister only if it's registered
       if [ "$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
       then
