@@ -201,7 +201,7 @@ cat > "$backup_unregister_script_path" << 'DOC'
 # UNREGISTER AS A BLOCK PRODUCER                                                                     #
 #----------------------------------------------------------------------------------------------------#
 
-remcli wallet unlock --password $walletpass 2>&1
+remcli wallet unlock --password $walletpass > /dev/null 2>&1
 remcli system unregprod $accountname -p $accountname@$producerpermission
 DOC
   chmod u+x "$backup_unregister_script_path"
