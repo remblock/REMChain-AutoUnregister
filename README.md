@@ -12,7 +12,7 @@ sudo wget https://github.com/remblock/REMChain-AutoUnregister/raw/master/produce
 
 ***
 
-## Edit Config:
+## Edit Auto-Unregister Config:
 
 ```
 nano remblock/auto-unregister/config
