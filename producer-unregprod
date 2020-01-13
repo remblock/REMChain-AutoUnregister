@@ -18,12 +18,12 @@ fi
 # CONFIGURATION VARIABLES                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-create_dir="/root/remblock/auto-unregister"
-config_file="/root/remblock/auto-unregister/config"
-backup_unregister_script_path="/root/remblock/auto-unregister/bp-unregister"
+create_dir="/root/remblock/auto-unregprod"
+config_file="/root/remblock/auto-unregprod/config"
+backup_unregprod_script_path="/root/remblock/auto-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-cron_cmd="/root/remblock/auto-unregister/producer-unregister"
+cron_cmd="/root/remblock/auto-unregprod/producer-unregprod"
 now_epoch="$(date +%s)"
 
 #----------------------------------------------------------------------------------------------------#
@@ -42,7 +42,7 @@ fi
 
 if [ ! -f "$config_file" ]
 then
-  echo "#Configuration file for the unregister script" > "$config_file"
+  echo "#Configuration file for the unregprod script" > "$config_file"
   echo "#Make the entries as variable=value" >> "$config_file"
   echo " " >> "$config_file"
 fi
@@ -212,7 +212,7 @@ if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
 else
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e check_last_block_minutes
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   echo ""
 fi
@@ -222,12 +222,12 @@ then
 fi
 
 #----------------------------------------------------------------------------------------------------#
-# CREATES THE BACKUP UNREGISTER SCRIPT IF IT DOESN' EXIST                                            #
+# CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -f "$backup_unregister_script_path" ]
+if [ ! -f "$backup_unregprod_script_path" ]
 then
-cat > "$backup_unregister_script_path" << 'DOC'
+cat > "$backup_unregprod_script_path" << 'DOC'
 #!/usr/bin/env bash
 
 #----------------------------------------------------------------------------------------------------#
@@ -237,7 +237,7 @@ cat > "$backup_unregister_script_path" << 'DOC'
 remcli wallet unlock --password $walletpass > /dev/null 2>&1
 remcli system unregprod $accountname -p $accountname@$producerpermission
 DOC
-  chmod u+x "$backup_unregister_script_path"
+  chmod u+x "$backup_unregprod_script_path"
 fi
 
 #****************************************************************************************************#
@@ -275,7 +275,7 @@ function check_produce_minutes() {
   if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
   then
     #Check if the recover script is already running before starting it again
-    if ! pgrep 'bp-unregister' &> /dev/null
+    if ! pgrep 'bp-unregprod' &> /dev/null
     then
       #Execute unregister only if it's registered
       if [ "$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
@@ -283,8 +283,8 @@ function check_produce_minutes() {
         export accountname
         export walletpass
         export producerpermission
-        bash "$backup_unregister_script_path" &>/dev/null
-        send_telegram_messages "Auto-Unregister script has executed"
+        bash "$backup_unregprod_script_path" &>/dev/null
+        send_telegram_messages "Auto-Unregprod script has executed"
       fi
     fi
   fi
