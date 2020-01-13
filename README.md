@@ -10,5 +10,5 @@ sudo wget https://github.com/remblock/REMChain-AutoUnregister/raw/master/produce
 # Edit Config:
 
 ```
-nano remblock/auto-failover/config
+nano remblock/auto-unregister/config
 ```
