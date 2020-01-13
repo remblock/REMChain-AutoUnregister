@@ -15,5 +15,5 @@ sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/pr
 ### Edit Automated-Unregprod Config:
 
 ```
-nano remblock/auto-unregister/config
+nano remblock/auto-unregprod/config
 ```
