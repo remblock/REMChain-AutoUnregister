@@ -100,9 +100,8 @@ if get_config_value accountname
 then
   accountname="$global_value"
 else
-  read -p "ENTER YOUR ACCOUNT NAME: " -e accountname
+  accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
   echo "accountname=$accountname" >> "$config_file"
-  echo ""
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -113,11 +112,21 @@ if get_config_value walletpass
 then
   walletpass="$global_value"
 else
-  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
+  walletpass=$(cat walletpass)
   echo "walletpass=$walletpass" >> "$config_file"
-  echo ""
 fi
 
+#----------------------------------------------------------------------------------------------------#
+# GET ACTIVE PRODUCER PUBLIC KEY IF NOT ALREADY ON THE CONFIG FILE                                   #
+#----------------------------------------------------------------------------------------------------#
+
+if get_config_value activeproducerpublickey
+then
+  activeproducerpublickey="$global_value"
+else
+  activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # GET PERMISSION IF NOT ALREADY ON THE CONFIG FILE                                                   #
@@ -127,9 +136,13 @@ if get_config_value producerpermission
 then
   producerpermission="$global_value"
 else
-  read -p "ENTER YOUR KEY PERMISSION: " -e producerpermission
+  producerpermission=$(remcli get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
   echo "producerpermission=$producerpermission" >> "$config_file"
-  echo ""
+fi
+
+if  [ -z "$producerpermission" ]
+then
+  sed -i "/^producerpermission=/s/producerpermission=/producerpermission=owner/" "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -149,42 +162,39 @@ else
   then
     telegram_enabled=true
     echo "telegram_enabled=true" >> "$config_file"
+    if get_config_value telegram_token
+    then
+      telegram_token="$global_value"
+    else
+      echo ""
+      read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+      echo "telegram_token=$telegram_token" >> "$config_file"
+      echo ""
+    fi
+    if get_config_value telegram_chatid
+    then
+      telegram_chatid="$global_value"
+    else
+      read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+      echo "telegram_chatid=$telegram_chatid" >> "$config_file"
+      echo ""
+    fi
   else
     echo "telegram_enabled=false" >> "$config_file"
-  fi
-  echo ""
-fi
-
-if $telegram_enabled
-then
-  if get_config_value telegram_token
-  then
-    telegram_token="$global_value"
-  else
-    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-    echo "telegram_token=$telegram_token" >> "$config_file"
-    echo ""
-  fi
-  if get_config_value telegram_chatid
-  then
-    telegram_chatid="$global_value"
-  else
-    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-    echo "telegram_chatid=$telegram_chatid" >> "$config_file"
     echo ""
   fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
-# GET BP MONITOR REMNODE VALUES IF NOT SET IN THE CONFIG FILE                                        #
+# USER BLOCK MINUTE VALUE IF NOT SET IN THE CONFIG FILE                                              #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value bpm_check_produce_minutes
+if get_config_value check_last_block_minutes
 then
-  bpm_check_produce_minutes="$global_value"
+  check_last_block_minutes="$global_value"
 else
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e bpm_check_produce_minutes
-  echo "bpm_check_produce_minutes=$bpm_check_produce_minutes" >> "$config_file"
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e check_last_block_minutes
+  echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   echo ""
 fi
 
@@ -238,8 +248,8 @@ function remnodelogtime_to_epoch() {
 function check_produce_minutes() {
   last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-  config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
-  if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+  last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
+  if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
   then
     #Check if the recover script is already running before starting it again
     if ! pgrep 'bp-unregister' &> /dev/null
@@ -265,9 +275,9 @@ if [ ! -f "$create_dir/last_check_epoch.txt" ]
 then
   echo $now_epoch > "$create_dir/last_check_epoch.txt"
 else
-  config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
+  last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
   last_check_epoch=$(cat "$create_dir/last_check_epoch.txt")
-  if (( ($now_epoch - $last_check_epoch) >= $config_minutes_in_seconds ))
+  if (( ($now_epoch - $last_check_epoch) >= $last_block_minutes_in_seconds ))
   then
     echo $now_epoch > "$create_dir/last_check_epoch.txt"
     check_produce_minutes
