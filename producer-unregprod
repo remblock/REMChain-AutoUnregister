@@ -235,7 +235,7 @@ cat > "$backup_unregprod_script_path" << 'DOC'
 #----------------------------------------------------------------------------------------------------#
 
 remcli wallet unlock --password $walletpass > /dev/null 2>&1
-remcli system unregprod $accountname -p $accountname@$producerpermission
+remcli system unregprod $accountname -x 120 -p $accountname@$producerpermission
 DOC
   chmod u+x "$backup_unregprod_script_path"
 fi
