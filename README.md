@@ -7,7 +7,7 @@
 ### Setup Automated-Unregprod:
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/producer-unregister && sudo chmod u+x producer-unregister && sudo ./producer-unregister
+sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/producer-unregprod && sudo chmod u+x producer-unregprod && sudo ./producer-unregprod
 ```
 
 ***
