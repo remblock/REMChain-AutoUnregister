@@ -104,6 +104,11 @@ else
   echo "accountname=$accountname" >> "$config_file"
 fi
 
+if  [ -z "$accountname" ]
+then
+  sed -i "/^accountname=/s/accountname=/accountname=<your account name>/" "$config_file"
+fi
+
 #----------------------------------------------------------------------------------------------------#
 # GET WALLET PASSWORD IF NOT ALREADY ON THE CONFIG FILE                                              #
 #----------------------------------------------------------------------------------------------------#
@@ -114,6 +119,11 @@ then
 else
   walletpass=$(cat walletpass)
   echo "walletpass=$walletpass" >> "$config_file"
+fi
+
+if  [ -z "$walletpass" ]
+then
+  sed -i "/^walletpass=/s/walletpass=/walletpass=<your wallet password>/" "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -196,6 +206,11 @@ else
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOUR NOT PRODUCERING?: " -e check_last_block_minutes
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   echo ""
+fi
+
+if  [ -z "$check_last_block_minutes" ]
+then
+  sed -i "/^check_last_block_minutes=/s/check_last_block_minutes=/check_last_block_minutes=5/" "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
