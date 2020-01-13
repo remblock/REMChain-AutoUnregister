@@ -103,7 +103,6 @@ else
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
   echo "accountname=$accountname" >> "$config_file"
 fi
-
 if  [ -z "$accountname" ]
 then
   sed -i "/^accountname=/s/accountname=/accountname=<your account name>/" "$config_file"
@@ -120,7 +119,6 @@ else
   walletpass=$(cat walletpass)
   echo "walletpass=$walletpass" >> "$config_file"
 fi
-
 if  [ -z "$walletpass" ]
 then
   sed -i "/^walletpass=/s/walletpass=/walletpass=<your wallet password>/" "$config_file"
@@ -137,6 +135,11 @@ else
   activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
+if  [ -z "$activeproducerpublickey" ]
+then
+  activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # GET PERMISSION IF NOT ALREADY ON THE CONFIG FILE                                                   #
@@ -149,7 +152,6 @@ else
   producerpermission=$(remcli get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
-
 if  [ -z "$producerpermission" ]
 then
   sed -i "/^producerpermission=/s/producerpermission=/producerpermission=owner/" "$config_file"
@@ -194,6 +196,14 @@ else
     echo ""
   fi
 fi
+if  [ -z "$telegram_token" ]
+then
+  sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
+fi
+if  [ -z "$telegram_chatid" ]
+then
+  sed -i "/^telegram_chatid=/s/telegram_chatid=/telegram_chatid=<your telegram chat id>/" "$config_file"
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # USER BLOCK MINUTE VALUE IF NOT SET IN THE CONFIG FILE                                              #
@@ -207,7 +217,6 @@ else
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   echo ""
 fi
-
 if  [ -z "$check_last_block_minutes" ]
 then
   sed -i "/^check_last_block_minutes=/s/check_last_block_minutes=/check_last_block_minutes=5/" "$config_file"
