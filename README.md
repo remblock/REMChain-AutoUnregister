@@ -1,6 +1,6 @@
 # REMChain-Automated-Unregprod
 
-#### This script will unregister a block producer if they fail to produce blocks by a certain number of minutes.
+#### This script will unregister a block producer if they fail to produce blocks within a specified time frame. The time frame can be adjusted according to the block producers tolerance/preference.
 
 ***
 
