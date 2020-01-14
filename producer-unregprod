@@ -162,6 +162,7 @@ fi
 
 if get_config_value telegram_enabled
 then
+  if
   telegram_enabled="$global_value"
   then
     telegram_enabled=true
