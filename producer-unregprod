@@ -178,9 +178,9 @@ else
     echo ""
   fi
 fi
-if get_config_value telegram_token
+if get_config_value telegram_enabled
 then
-  if telegram_enabled
+  if get_config_value telegram_token
   then
     telegram_token="$global_value"
   else
@@ -194,9 +194,9 @@ if  [ -z "$telegram_token" ]
 then
   sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
 fi
-if get_config_value telegram_chatid
+if get_config_value telegram_enabled
 then
-  if telegram_enabled
+  if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
   else
