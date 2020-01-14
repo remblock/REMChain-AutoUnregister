@@ -197,16 +197,6 @@ else
   fi
 fi
 
-if  [ -z "$telegram_token" ]
-then
-  sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
-fi
-
-if  [ -z "$telegram_chatid" ]
-then
-  sed -i "/^telegram_chatid=/s/telegram_chatid=/telegram_chatid=<your telegram chat id>/" "$config_file"
-fi
-
 #----------------------------------------------------------------------------------------------------#
 # USER BLOCK MINUTE VALUE IF NOT SET IN THE CONFIG FILE                                              #
 #----------------------------------------------------------------------------------------------------#
@@ -218,10 +208,6 @@ else
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   echo ""
-fi
-if  [ -z "$check_last_block_minutes" ]
-then
-  sed -i "/^check_last_block_minutes=/s/check_last_block_minutes=/check_last_block_minutes=5/" "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
