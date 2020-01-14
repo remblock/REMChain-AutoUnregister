@@ -196,14 +196,6 @@ else
     echo ""
   fi
 fi
-if  [ -z "$telegram_chatid" ]
-then
-  sed -i "/^telegram_chatid=/s/telegram_chatid=/telegram_chatid=<your telegram chat id>/" "$config_file"
-fi
-if  [ -z "$telegram_token" ]
-then
-  sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
-fi
 
 #----------------------------------------------------------------------------------------------------#
 # USER BLOCK MINUTE VALUE IF NOT SET IN THE CONFIG FILE                                              #
