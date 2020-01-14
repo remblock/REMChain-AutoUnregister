@@ -206,7 +206,6 @@ then
     sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
   fi
 fi
-fi
 
 #----------------------------------------------------------------------------------------------------#
 # USER BLOCK MINUTE VALUE IF NOT SET IN THE CONFIG FILE                                              #
