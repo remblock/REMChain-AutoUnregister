@@ -178,28 +178,32 @@ else
     echo ""
   fi
 fi
-
 if get_config_value telegram_token
 then
-  telegram_token="$global_value"
-else
-  echo ""
-  read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-  echo "telegram_token=$telegram_token" >> "$config_file"
-  echo ""
-  if  [ -z "$telegram_token" ]
+  if get_config_value telegram_enabled
   then
-    sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
+    telegram_token="$global_value"
+  else
+    echo ""
+    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+    echo "telegram_token=$telegram_token" >> "$config_file"
+    echo ""
   fi
 fi
-
+if  [ -z "$telegram_token" ]
+then
+  sed -i "/^telegram_token=/s/telegram_token=/telegram_token=<your telegram api token>/" "$config_file"
+fi
 if get_config_value telegram_chatid
 then
-  telegram_chatid="$global_value"
-else
-  read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-  echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-  echo ""
+  if get_config_value telegram_enabled
+  then
+    telegram_chatid="$global_value"
+  else
+    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+    echo "telegram_chatid=$telegram_chatid" >> "$config_file"
+    echo ""
+  fi
   if  [ -z "$telegram_chatid" ]
   then
     sed -i "/^telegram_chatid=/s/telegram_chatid=/telegram_chatid=<your telegram chat id>/" "$config_file"
