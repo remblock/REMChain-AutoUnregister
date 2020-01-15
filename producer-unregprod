@@ -63,12 +63,12 @@ fi
 function get_user_answer_yn(){
   while :
   do
-    read -p "$1 (Y/N): " answer
+    read -p "$1 [y/n]: " answer
     answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
-      *) echo  "Invalid Answer [yes/no/y/n expected]";continue;;
+      *) echo  "Invalid Answer [yes/y/no/n expected]";continue;;
     esac
   done
 }
