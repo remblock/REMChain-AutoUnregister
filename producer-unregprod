@@ -145,44 +145,44 @@ fi
 
 if get_config_value telegram_enabled
 then
-  ��if [ "$global_value" = "true" ]
-  ��then
-����    telegram_enabled=true
-��  else
-����    telegram_enabled=false
-��  fi
+  if [ "$global_value" = "true" ]
+  then
+    telegram_enabled=true
+  else
+    telegram_enabled=false
+  fi
 else
-  ��if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
-��  then
-����    telegram_enabled=true
-����    echo "telegram_enabled=true" >> "$config_file"
-��  else
-    ����echo "telegram_enabled=false" >> "$config_file"
-����    echo ""
-  ��fi
+  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
+  then
+    telegram_enabled=true
+    echo "telegram_enabled=true" >> "$config_file"
+  else
+    echo "telegram_enabled=false" >> "$config_file"
+    echo ""
+  fi
 fi
 if $telegram_enabled
 then
-  ��if get_config_value telegram_token
-  ��then
-����    telegram_token="$global_value"
-��  else
-����    echo ""
+  if get_config_value telegram_token
+  then
+    telegram_token="$global_value"
+  else
+    echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-����    echo ""
-��  fi
+    echo ""
+  fi
 fi
 if $telegram_enabled
 then
-  ��if get_config_value telegram_chatid
-��  then
-����    telegram_chatid="$global_value"
-  ��else
-����    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-    ����echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-    ����echo ""
-��  fi
+  if get_config_value telegram_chatid
+  then
+    telegram_chatid="$global_value"
+  else
+    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+    echo "telegram_chatid=$telegram_chatid" >> "$config_file"
+    echo ""
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
