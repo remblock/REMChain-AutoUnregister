@@ -217,15 +217,10 @@ fi
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
-# SEND THE STRING PARAMETER TO TELEGRAM                                                              #
+# SET TELEGRAM SEND COMMAND TO FALSE                                                                 #
 #----------------------------------------------------------------------------------------------------#
 
-function send_telegram_messages() {
-  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ] && $telegram_enabled
-  then
-    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$1" &>/dev/null
-  fi
-}
+send_message=false
 
 #----------------------------------------------------------------------------------------------------#
 # TRANSLATE THE TIME FORMAT FROM REMCLI FORMATE TO EPOCH TIME                                        #
@@ -256,7 +251,8 @@ function check_produce_minutes() {
         export walletpass
         export producerpermission
         bash "$backup_unregprod_script_path" &>/dev/null
-        send_telegram_messages "Auto-Unregprod script has executed"
+        telegram_message="Auto-Unregprod script has executed"
+        send_message=true
       fi
     fi
   fi
@@ -276,5 +272,17 @@ else
   then
     echo $now_epoch > "$create_dir/last_check_epoch.txt"
     check_produce_minutes
+  fi
+fi
+
+#----------------------------------------------------------------------------------------------------#
+# SEND THE STRING PARAMETER TO TELEGRAM                                                              #
+#----------------------------------------------------------------------------------------------------#
+
+if $send_message
+then  
+  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ] && $telegram_enabled
+  then
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
 fi
