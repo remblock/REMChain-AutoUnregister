@@ -157,6 +157,7 @@ else
     telegram_enabled=true
     echo "telegram_enabled=true" >> "$config_file"
   else
+    telegram_enabled=false
     echo "telegram_enabled=false" >> "$config_file"
     echo ""
   fi
