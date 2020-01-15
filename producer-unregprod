@@ -281,7 +281,7 @@ fi
 
 if $send_message
 then  
-  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ] && $telegram_enabled
+  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ] && telegram_enabled
   then
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text=$telegram_message &>/dev/null
   fi
