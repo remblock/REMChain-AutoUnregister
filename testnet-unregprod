@@ -124,7 +124,7 @@ then
   activeproducerpublickey="$global_value"
 else
   activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',' /dev/null 2>&1)
-  if [[ -z "activeproducerpublickey" ]]; then activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',' /dev/null 2>&1); fi
+  if [[ -z "$activeproducerpublickey" ]]; then activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',' /dev/null 2>&1); fi
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -137,7 +137,7 @@ then
   producerpermission="$global_value"
 else
   producerpermission=$(remcli get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p /dev/null 2>&1)
-  if [[ -z "producerpermission" ]]; then producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p /dev/null 2>&1); fi
+  if [[ -z "$producerpermission" ]]; then producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p /dev/null 2>&1); fi
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
 
@@ -243,7 +243,7 @@ function remnodelogtime_to_epoch() {
 
 function check_produce_minutes() {
   last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',' /dev/null 2>&1)
-  if [[ -z "last_block_date" ]]; then last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',' /dev/null 2>&1); fi
+  if [[ -z "$last_block_date" ]]; then last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',' /dev/null 2>&1); fi
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
   if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
