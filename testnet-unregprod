@@ -275,6 +275,7 @@ else
   then
     echo $now_epoch > "$create_dir/last_check_epoch.txt"
     check_produce_minutes
+    rm last_check_epoch.txt
   fi
 fi
 
