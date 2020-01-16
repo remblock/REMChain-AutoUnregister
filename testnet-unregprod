@@ -239,7 +239,7 @@ function remnodelogtime_to_epoch() {
 #----------------------------------------------------------------------------------------------------#
 
 function check_produce_minutes() {
-    #Check if the recover script is already running before starting it again
+  #Check if the recover script is already running before starting it again
   if ! pgrep 'bp-unregprod' &> /dev/null
   then
     #Execute unregister only if it's registered
@@ -253,7 +253,6 @@ function check_produce_minutes() {
       send_message=true
     fi
   fi
-fi
 }
 
 #----------------------------------------------------------------------------------------------------#
