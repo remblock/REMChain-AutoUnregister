@@ -263,8 +263,7 @@ function check_produce_minutes() {
   then
     echo "true" > "$create_dir/unregprod_check"
   else
-    unregprod_check=$(cat "$create_dir/unregprod_check")
-    if (( $unregprod_check == "true" ))
+    if grep "true" "$create_dir/unregprod_check"
     then
       last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
       last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
