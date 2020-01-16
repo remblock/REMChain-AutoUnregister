@@ -123,7 +123,7 @@ if get_config_value activeproducerpublickey
 then
   activeproducerpublickey="$global_value"
 else
-  activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  activeproducerpublickey=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -239,7 +239,7 @@ function remnodelogtime_to_epoch() {
 #----------------------------------------------------------------------------------------------------#
 
 function check_produce_minutes() {
-  last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
   if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
@@ -248,7 +248,7 @@ function check_produce_minutes() {
     if ! pgrep 'bp-unregprod' &> /dev/null
     then
       #Execute unregister only if it's registered
-      if [ "$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
+      if [ "$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
       then
         export accountname
         export walletpass
