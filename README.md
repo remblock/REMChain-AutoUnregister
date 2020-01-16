@@ -7,7 +7,7 @@
 ### Setup Automated-Unregprod:
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/producer-unregprod && sudo chmod u+x producer-unregprod && sudo ./producer-unregprod
+sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/mainet-unregprod && sudo chmod u+x mainet-unregprod && sudo ./mainet-unregprod
 ```
 
 ***
@@ -15,5 +15,5 @@ sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/pr
 ### Edit Automated-Unregprod Config:
 
 ```
-nano remblock/auto-unregprod/config
+nano remblock/mainet-unregprod/config
 ```
