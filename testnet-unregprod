@@ -212,7 +212,8 @@ cat > "$backup_unregprod_script_path" << 'DOC'
 #----------------------------------------------------------------------------------------------------#
 
 remcli wallet unlock --password $walletpass > /dev/null 2>&1
-remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
+output=$(remcli system unregprod $accountname -x 120 -p $accountname@$producerpermission)
+if [[ ! "$output" =~ "executed transaction" ]]; then remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission; fi
 DOC
   chmod u+x "$backup_unregprod_script_path"
 fi
