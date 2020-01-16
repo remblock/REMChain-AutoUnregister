@@ -18,12 +18,12 @@ fi
 # CONFIGURATION VARIABLES                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-create_dir="/root/remblock/auto-unregprod"
-config_file="/root/remblock/auto-unregprod/config"
-backup_unregprod_script_path="/root/remblock/auto-unregprod/bp-unregprod"
+create_dir="/root/remblock/mainnet-unregprod"
+config_file="/root/remblock/mainnet-unregprod/config"
+backup_unregprod_script_path="/root/remblock/mainnet-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-cron_cmd="/root/remblock/auto-unregprod/producer-unregprod"
+cron_cmd="/root/remblock/mainnet-unregprod/mainnet-unregprod"
 now_epoch="$(date +%s)"
 
 #----------------------------------------------------------------------------------------------------#
