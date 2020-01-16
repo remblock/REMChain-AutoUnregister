@@ -210,7 +210,7 @@ cat > "$backup_unregprod_script_path" << 'DOC'
 #----------------------------------------------------------------------------------------------------#
 
 remcli wallet unlock --password $walletpass > /dev/null 2>&1
-output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission -f 2>&1)
+output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
 DOC
   chmod u+x "$backup_unregprod_script_path"
 fi
@@ -239,24 +239,18 @@ function remnodelogtime_to_epoch() {
 #----------------------------------------------------------------------------------------------------#
 
 function check_produce_minutes() {
-  last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-  last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
-  if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
+  #Check if the recover script is already running before starting it again
+  if ! pgrep 'bp-unregprod' &> /dev/null
   then
-    #Check if the recover script is already running before starting it again
-    if ! pgrep 'bp-unregprod' &> /dev/null
+    #Execute unregister only if it's registered
+    if [ "$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
     then
-      #Execute unregister only if it's registered
-      if [ "$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
-      then
-        export accountname
-        export walletpass
-        export producerpermission
-        bash "$backup_unregprod_script_path" &>/dev/null
-        telegram_message="Auto-Unregprod script has executed"
-        send_message=true
-      fi
+      export accountname
+      export walletpass
+      export producerpermission
+      bash "$backup_unregprod_script_path" &>/dev/null
+      telegram_message="Auto-Unregprod script has executed"
+      send_message=true
     fi
   fi
 }
@@ -265,18 +259,13 @@ function check_produce_minutes() {
 # MAIN PART OF THE SCRIPT                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -f "$create_dir/last_check_epoch.txt" ]
-then
-  echo $now_epoch > "$create_dir/last_check_epoch.txt"
-else
+  last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
-  last_check_epoch=$(cat "$create_dir/last_check_epoch.txt")
-  if (( ($now_epoch - $last_check_epoch) >= $last_block_minutes_in_seconds ))
+  if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
   then
-    echo $now_epoch > "$create_dir/last_check_epoch.txt"
     check_produce_minutes
   fi
-fi
 
 #----------------------------------------------------------------------------------------------------#
 # SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)                            #
