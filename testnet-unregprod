@@ -264,7 +264,8 @@ fi
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   last_block_minutes_in_seconds="$((check_last_block_minutes * 60))"
   if (( ($now_epoch - $last_block_epoch) >= $last_block_minutes_in_seconds ))
-     check_produce_minutes
+  then
+    check_produce_minutes
   fi
 
 #----------------------------------------------------------------------------------------------------#
