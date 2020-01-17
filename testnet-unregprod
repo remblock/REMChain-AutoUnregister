@@ -267,7 +267,7 @@ function check_produce_minutes() {
     then
       last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
       last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-      config_minutes_in_seconds="$(("$bpm_check_produce_minutes" * 60))"
+      config_minutes_in_seconds=$(($bpm_check_produce_minutes * 60))
       if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
       then
         check_produce_minutes
