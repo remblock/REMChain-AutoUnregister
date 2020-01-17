@@ -261,7 +261,7 @@ function check_produce_minutes() {
 
   if [ ! -f "/root/check_unregprod" ]
   then
-    cat << EOF > "/root/check_unregprod" 
+    cat << EOF > "/root/check_unregprod"
 true
 EOF
   else
