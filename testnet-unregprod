@@ -261,7 +261,9 @@ function check_produce_minutes() {
 
   if [ ! -f "$create_dir/unregprod_check" ]
   then
-    cat << EOF > $create_dir/unregprod_check; true; EOF
+    cat << EOF > "$create_dir/unregprod_check" 
+true
+EOF
   else
     if grep "true" "$create_dir/unregprod_check"
     then
