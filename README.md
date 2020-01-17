@@ -17,3 +17,11 @@ sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/ma
 ```
 nano remblock/mainnet-unregprod/config
 ```
+
+### Edit Automated-Unregprod (Enable/Disable):
+
+```
+nano /root/check_unregprod
+```
+
+#### Edit file to "true" to enable and "false" to disable
