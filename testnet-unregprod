@@ -20,7 +20,7 @@ fi
 
 create_dir="/root/remblock/testnet-unregprod"
 config_file="/root/remblock/testnet-unregprod/config"
-backup_unregprod_script_path="/root/remblock/testnet-unregprod/bp-unregprod"
+testnet_unregprod_script_path="/root/remblock/testnet-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/testnet-unregprod/testnet-unregprod"
@@ -200,9 +200,9 @@ fi
 # CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -f "$backup_unregprod_script_path" ]
+if [ ! -f "$testnet_unregprod_script_path" ]
 then
-cat > "$backup_unregprod_script_path" << 'DOC'
+cat > "$testnet_unregprod_script_path" << 'DOC'
 #!/usr/bin/env bash
 
 #----------------------------------------------------------------------------------------------------#
@@ -212,7 +212,7 @@ cat > "$backup_unregprod_script_path" << 'DOC'
 remcli wallet unlock --password $walletpass > /dev/null 2>&1
 output=$(remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
 DOC
-  chmod u+x "$backup_unregprod_script_path"
+  chmod u+x "$testnet_unregprod_script_path"
 fi
 
 #****************************************************************************************************#
@@ -248,7 +248,7 @@ function check_produce_minutes() {
       export accountname
       export walletpass
       export producerpermission
-      bash "$backup_unregprod_script_path" &>/dev/null
+      bash "$testnet_unregprod_script_path" &>/dev/null
       telegram_message="Auto-Unregprod script has executed"
       send_message=true
     fi
