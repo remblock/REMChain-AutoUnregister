@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #****************************************************************************************************#
-#                                      REMCHAIN-TESTNET-UNREGPROD                                    #
+#                                           TESTCHAIN-UNREGPROD                                      #
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
@@ -18,12 +18,12 @@ fi
 # CONFIGURATION VARIABLES                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-create_dir="/root/remblock/testnet-unregprod"
-config_file="/root/remblock/testnet-unregprod/config"
-testnet_unregprod_script_path="/root/remblock/testnet-unregprod/bp-unregprod"
+create_dir="/root/remblock/testchain-unregprod"
+config_file="/root/remblock/testchain-unregprod/config"
+testchain_unregprod_script_path="/root/remblock/testchain-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-cron_cmd="/root/remblock/testnet-unregprod/testnet-unregprod"
+cron_cmd="/root/remblock/testchain-unregprod/testchain-unregprod"
 now_epoch="$(date +%s)"
 
 #----------------------------------------------------------------------------------------------------#
@@ -200,9 +200,9 @@ fi
 # CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -f "$testnet_unregprod_script_path" ]
+if [ ! -f "$testchain_unregprod_script_path" ]
 then
-cat > "$testnet_unregprod_script_path" << 'DOC'
+cat > "$testchain_unregprod_script_path" << 'DOC'
 #!/usr/bin/env bash
 
 #----------------------------------------------------------------------------------------------------#
@@ -212,7 +212,7 @@ cat > "$testnet_unregprod_script_path" << 'DOC'
 remcli wallet unlock --password $walletpass > /dev/null 2>&1
 output=$(remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
 DOC
-  chmod u+x "$testnet_unregprod_script_path"
+  chmod u+x "$testchain_unregprod_script_path"
 fi
 
 #****************************************************************************************************#
@@ -248,8 +248,8 @@ function check_produce_minutes() {
       export accountname
       export walletpass
       export producerpermission
-      bash "$testnet_unregprod_script_path" &>/dev/null
-      telegram_message="Auto-Unregprod script has executed"
+      bash "$testchain_unregprod_script_path" &>/dev/null
+      telegram_message="Testchain-Unregprod script has executed"
       send_message=true
     fi
   fi
