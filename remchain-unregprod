@@ -100,6 +100,15 @@ then
   accountname="$global_value"
 else
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
+  if [ ! -z "$accountname" ]
+  then
+    echo "accountname=$accountname" >> "$config_file"
+  fi
+fi
+if [ -z "$accountname" ]
+then
+  echo ""
+  read -p "ENTER YOUR PRODUCER NAME: " -e accountname
   echo "accountname=$accountname" >> "$config_file"
 fi
 
@@ -112,6 +121,15 @@ then
   walletpass="$global_value"
 else
   walletpass=$(cat walletpass)
+  if [ ! -z "$walletpass" ]
+  then
+    echo "walletpass=$walletpass" >> "$config_file"
+  fi
+fi
+if [ -z "$walletpass" ]
+then
+  echo ""
+  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
 fi
 
@@ -124,6 +142,23 @@ then
   activeproducerpublickey="$global_value"
 else
   activeproducerpublickey=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  if [ ! -z "$activeproducerpublickey" ]
+  then
+  echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  fi
+fi
+if [ -z "$activeproducerpublickey" ]
+then
+  activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  if [ ! -z "$activeproducerpublickey" ]
+  then
+    echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  fi
+fi
+if [ -z "$activeproducerpublickey" ] 
+then
+  echo ""
+  read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -136,8 +171,26 @@ then
   producerpermission="$global_value"
 else
   producerpermission=$(remcli -u https://remchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+  if [ ! -z "$producerpermission" ]
+  then
+    echo "producerpermission=$producerpermission" >> "$config_file"
+  fi
+fi
+if [ -z "$producerpermission" ]
+then
+  producerpermission=$(remcli get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+  if [ ! -z "$producerpermission" ]
+  then
+    echo "producerpermission=$producerpermission" >> "$config_file"
+  fi
+fi
+if [ -z "$producerpermission" ]
+then
+  echo ""
+  read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
+
 
 #----------------------------------------------------------------------------------------------------#
 # GET TELEGRAM DATA IF NOT ALREADY ON THE CONFIG FILE                                                #
@@ -152,6 +205,7 @@ then
     telegram_enabled=false
   fi
 else
+  echo ""
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
@@ -159,7 +213,6 @@ else
   else
     telegram_enabled=false
     echo "telegram_enabled=false" >> "$config_file"
-    echo ""
   fi
 fi
 if $telegram_enabled
@@ -171,15 +224,14 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-    echo ""
   fi
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
   else
+    echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
     echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-    echo ""
   fi
 fi
 
@@ -191,6 +243,7 @@ if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
 else
+  echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   echo ""
@@ -240,10 +293,15 @@ function remnodelogtime_to_epoch() {
 
 function check_produce_minutes() {
   #Check if the recover script is already running before starting it again
+  active=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
+  if [ -z "$active" ]
+  then
+    active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  fi
   if ! pgrep 'bp-unregprod' &> /dev/null
   then
     #Execute unregister only if it's registered
-    if [ "$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')" == "1" ]
+    if [ "$active" == "1" ]
     then
       export accountname
       export walletpass
@@ -268,6 +326,10 @@ EOF
     if grep "true" "/root/check_unregprod"
     then
       last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+      if [ -z "$last_block_date" ]
+      then
+        last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+      fi
       last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
       config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
       if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
