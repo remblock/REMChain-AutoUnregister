@@ -226,8 +226,7 @@ then
   if [ ! -z "$telegram_token" ]
   then
     echo "telegram_token=$telegram_token" >> "$config_file"
-  fi
-  if [ -z "$telegram_token" ]
+  elif [ -z "$telegram_token" ]
   then
     echo "telegram_token=123456789:AAHY-Ye6tFOP_AMFTdQXw1hGwRo-sSOyjPS" >> "$config_file"
   fi
@@ -241,8 +240,7 @@ then
   if [ ! -z "$telegram_chatid" ]
   then
     echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-  fi
-  if [ -z "$telegram_chatid" ]
+  elif [ -z "$telegram_chatid" ]
   then
     echo "telegram_chatid=123456789" >> "$config_file"
   fi
@@ -262,8 +260,7 @@ else
   if [ ! -z "$check_last_block_minutes" ]
   then
     echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
-  fi
-  if [ -z "$check_last_block_minutes" ]
+  elif [ -z "$check_last_block_minutes" ]
   then
     echo "check_last_block_minutes=5" >> "$config_file"
   fi
