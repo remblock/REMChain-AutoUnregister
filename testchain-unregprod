@@ -223,7 +223,7 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
   fi
-  if [ ! -z "$telegram_token" ]
+  if [ -z "$telegram_token" ]
   then
     echo "telegram_token=$telegram_token" >> "$config_file"
   fi
@@ -234,7 +234,7 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
   fi
-  if [ ! -z "$telegram_chatid" ]
+  if [ -z "$telegram_chatid" ]
   then
     echo "telegram_chatid=$telegram_chatid" >> "$config_file"
   fi
@@ -250,7 +250,7 @@ then
 else
   echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
-  if [ ! -z "$check_last_block_minutes" ]
+  if [ -z "$check_last_block_minutes" ]
   then
     echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
   fi
