@@ -225,7 +225,7 @@ then
   fi
   if [ -z "$telegram_token" ]
   then
-    echo "telegram_token= 123456789:AAHY-Ye6tFOP_AMFTdQXw1hGwRo-sSOyjPS" >> "$config_file"
+    echo "telegram_token=123456789:AAHY-Ye6tFOP_AMFTdQXw1hGwRo-sSOyjPS" >> "$config_file"
   fi
   if get_config_value telegram_chatid
   then
