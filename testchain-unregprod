@@ -108,7 +108,7 @@ fi
 if [ -z "$accountname" ]
 then
   echo ""
-  read -p "ENTER YOUR PRODUCER NAME: " accountname
+  read -p "ENTER YOUR PRODUCER NAME: " -e accountname
   echo "accountname=$accountname" >> "$config_file"
 fi
 
@@ -129,7 +129,7 @@ fi
 if [ -z "$walletpass" ]
 then
   echo ""
-  read -p "ENTER YOUR WALLET PASSWORD: " walletpass
+  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
 fi
 
@@ -158,7 +158,7 @@ fi
 if [ -z "$activeproducerpublickey" ] 
 then
   echo ""
-  read -p "ENTER YOUR PRODUCER PUBLIC KEY: " activeproducerpublickey
+  read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -187,7 +187,7 @@ fi
 if [ -z "$producerpermission" ]
 then
   echo ""
-  read -p "ENTER YOUR PRODUCER PERMISSION: " producerpermission
+  read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
 
@@ -221,7 +221,10 @@ then
     telegram_token="$global_value"
   else
     echo ""
-    read -p "ENTER YOUR TELEGRAM TOKEN API: " telegram_token
+    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+  fi
+  if [ ! -z "$telegram_token" ]
+  then
     echo "telegram_token=$telegram_token" >> "$config_file"
   fi
   if get_config_value telegram_chatid
@@ -229,7 +232,10 @@ then
     telegram_chatid="$global_value"
   else
     echo ""
-    read -p "ENTER YOUR TELEGRAM CHAT ID: " telegram_chatid
+    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+  fi
+  if [ ! -z "$telegram_chatid" ]
+  then
     echo "telegram_chatid=$telegram_chatid" >> "$config_file"
   fi
 fi
@@ -243,9 +249,11 @@ then
   check_last_block_minutes="$global_value"
 else
   echo ""
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " check_last_block_minutes
-  echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
-  echo ""
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
+  if [ ! -z "$check_last_block_minutes" ]
+  then
+    echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
