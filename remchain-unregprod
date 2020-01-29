@@ -101,12 +101,11 @@ then
 elif [ -z "$global_value" ]
 then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
-elif [ -z "$accountname" ]
-then
-  echo ""
-  read -p "ENTER YOUR PRODUCER NAME: " -e accountname
-elif [ ! -z "$accountname" ]
-then
+  if [ -z "$accountname" ]
+  then
+    echo ""
+    read -p "ENTER YOUR PRODUCER NAME: " -e accountname
+  fi  
   echo "accountname=$accountname" >> "$config_file"
 fi
 
@@ -120,12 +119,11 @@ then
 elif [ -z "$global_value" ]
 then
   walletpass=$(cat walletpass)
-elif [ -z "$walletpass" ]
-then
-  echo ""
-  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
-elif [ ! -z "$walletpass" ]
-then
+  if [ -z "$walletpass" ]
+  then
+    echo ""
+    read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
+  fi
   echo "walletpass=$walletpass" >> "$config_file"
 fi
 
@@ -139,15 +137,11 @@ then
 elif [ -z "$global_value" ]
 then
   activeproducerpublickey=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-elif [ -z "$activeproducerpublickey" ]
-then
-  activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-elif [ -z "$activeproducerpublickey" ]
-then
-  echo ""
-  read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
-elif [ ! -z "$activeproducerpublickey" ]
-then
+  if [ -z "$activeproducerpublickey" ]
+  then
+    echo ""
+    read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
+  fi
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -161,15 +155,11 @@ then
 elif [ -z "$global_value" ]
 then
   producerpermission=$(remcli -u https://remchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
-elif [ -z "$producerpermission" ]
-then
-  producerpermission=$(remcli get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
-elif [ -z "$producerpermission" ]
-then
-  echo ""
-  read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-elif [ ! -z "$producerpermission" ]
-then
+  if [ -z "$producerpermission" ]
+  then
+    echo ""
+    read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
+  fi
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
 
