@@ -219,24 +219,20 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  else
+  elif [ -z "$global_value" ]
+  then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-  fi
-  if [ -z "$telegram_token" ]
-  then
-    echo "telegram_token=123456789:AAHY-Ye6tFOP_AMFTdQXw1hGwRo-sSOyjPS" >> "$config_file"
+    echo "telegram_token=$telegram_token" >> "$config_file"
   fi
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
-  else
+  elif [ -z "$global_value" ]
+  then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-  fi
-  if [ -z "$telegram_chatid" ]
-  then
-    echo "telegram_chatid=123456789" >> "$config_file"
+    echo "telegram_chatid=$telegram_chatid" >> "$config_file"
   fi
 fi
 
@@ -247,13 +243,12 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-else
+elif [ -z "$global_value" ]
+then
   echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
-  if [ -z "$check_last_block_minutes" ]
-  then
-    echo "check_last_block_minutes=5" >> "$config_file"
-  fi
+  echo ""
+  echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
