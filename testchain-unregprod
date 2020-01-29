@@ -142,7 +142,6 @@ then
 elif [ -z "$activeproducerpublickey" ]
 then
   activeproducerpublickey=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-
 elif [ -z "$activeproducerpublickey" ]
 then
   echo ""
