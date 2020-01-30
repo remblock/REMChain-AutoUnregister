@@ -20,6 +20,7 @@ fi
 
 create_dir="/root/remblock/testchain-unregprod"
 config_file="/root/remblock/testchain-unregprod/config"
+check_unregprod_script_path="/root/check-unregprod"
 testchain_unregprod_script_path="/root/remblock/testchain-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
@@ -91,9 +92,9 @@ function get_config_value() {
 # CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -f "/root/check_unregprod" ]
+if [ ! -f "$check_unregprod_script_path" ]
 then
-  cat > "/root/check_unregprod" << 'DOC'
+cat > "$check_unregprod_script_path" << 'DOC'
 true 
 DOC
 
