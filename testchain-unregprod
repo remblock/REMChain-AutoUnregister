@@ -131,12 +131,14 @@ then
 elif [ -z "$global_value" ]
 then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
+  if [ ! -z "$accountname" ]
+  then
+    echo "accountname=$accountname" >> "$config_file"
+  fi
 elif [ -z "$accountname" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname  
-elif [ ! -z "$accountname" && -z "$global_value" ]
-then
   echo "accountname=$accountname" >> "$config_file"
 fi
 
@@ -150,12 +152,14 @@ then
 elif [ -z "$global_value" ]
 then
   walletpass=$(cat walletpass)
+  if [ ! -z "$walletpass" ]
+  then
+    echo "walletpass=$walletpass" >> "$config_file"
+  fi
 elif [ -z "$walletpass" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
-elif [ ! -z "$walletpass" && -z "$global_value" ]
-then  
   echo "walletpass=$walletpass" >> "$config_file"
 fi
 
@@ -169,12 +173,14 @@ then
 elif [ -z "$global_value" ]
 then
   activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  if [ ! -z "$activeproducerpublickey" ]
+  then
+    echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  fi
 elif [ -z "$activeproducerpublickey" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
-elif [ ! -z "$activeproducerpublickey" && -z "$global_value" ]  
-then 
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -188,12 +194,14 @@ then
 elif [ -z "$global_value" ]
 then
   producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+  if [ ! -z "$producerpermission" ]
+  then
+    echo "producerpermission=$producerpermission" >> "$config_file"
+  fi
 elif [ -z "$producerpermission" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-elif [ ! -z "$producerpermission" && -z "$global_value" ]
-then
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
 
