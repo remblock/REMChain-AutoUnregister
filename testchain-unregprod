@@ -212,7 +212,6 @@ then
 fi
 if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
 then
-  echo ""
   telegram_enabled=true
   echo "telegram_enabled=true" >> "$config_file"
 else
