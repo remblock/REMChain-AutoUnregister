@@ -20,6 +20,7 @@ fi
 
 create_dir="/root/remblock/remchain-unregprod"
 config_file="/root/remblock/remchain-unregprod/config"
+check_unregprod_script_path="/root/check-unregprod"
 remchain_unregprod_script_path="/root/remblock/remchain-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
@@ -87,6 +88,35 @@ function get_config_value() {
   fi
 }
 
+#----------------------------------------------------------------------------------------------------#
+# CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -f "$check_unregprod_script_path" ]
+then
+cat > "$check_unregprod_script_path" << 'DOC'
+true 
+DOC
+
+#----------------------------------------------------------------------------------------------------#
+# CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -f "$remchain_unregprod_script_path" ]
+then
+cat > "$remchain_unregprod_script_path" << 'DOC'
+#!/usr/bin/env bash
+
+#----------------------------------------------------------------------------------------------------#
+# UNREGISTER AS A BLOCK PRODUCER                                                                     #
+#----------------------------------------------------------------------------------------------------#
+
+remcli wallet unlock --password $walletpass > /dev/null 2>&1
+output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
+DOC
+  chmod u+x "$remchain_unregprod_script_path"
+fi
+
 #****************************************************************************************************#
 #                                   GETTING POSSIBLE MISSING VALUE                                   #
 #****************************************************************************************************#
@@ -101,11 +131,14 @@ then
 elif [ -z "$global_value" ]
 then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
-  if [ -z "$accountname" ]
+  if [ ! -z "$accountname" ]
   then
-    echo ""
-    read -p "ENTER YOUR PRODUCER NAME: " -e accountname
-  fi  
+    echo "accountname=$accountname" >> "$config_file"
+  fi
+elif [ -z "$accountname" && -z "$global_value" ]
+then
+  echo ""
+  read -p "ENTER YOUR PRODUCER NAME: " -e accountname  
   echo "accountname=$accountname" >> "$config_file"
 fi
 
@@ -119,11 +152,14 @@ then
 elif [ -z "$global_value" ]
 then
   walletpass=$(cat walletpass)
-  if [ -z "$walletpass" ]
+  if [ ! -z "$walletpass" ]
   then
-    echo ""
-    read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
+    echo "walletpass=$walletpass" >> "$config_file"
   fi
+elif [ -z "$walletpass" && -z "$global_value" ]
+then
+  echo ""
+  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   echo "walletpass=$walletpass" >> "$config_file"
 fi
 
@@ -137,11 +173,14 @@ then
 elif [ -z "$global_value" ]
 then
   activeproducerpublickey=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  if [ -z "$activeproducerpublickey" ]
+  if [ ! -z "$activeproducerpublickey" ]
   then
-    echo ""
-    read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
+    echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
   fi
+elif [ -z "$activeproducerpublickey" && -z "$global_value" ]
+then
+  echo ""
+  read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
   echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
@@ -155,11 +194,14 @@ then
 elif [ -z "$global_value" ]
 then
   producerpermission=$(remcli -u https://remchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
-  if [ -z "$producerpermission" ]
+  if [ ! -z "$producerpermission" ]
   then
-    echo ""
-    read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
+    echo "producerpermission=$producerpermission" >> "$config_file"
   fi
+elif [ -z "$producerpermission" && -z "$global_value" ]
+then
+  echo ""
+  read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
   echo "producerpermission=$producerpermission" >> "$config_file"
 fi
 
@@ -175,16 +217,14 @@ then
   else
     telegram_enabled=false
   fi
+fi
+if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
+then
+  telegram_enabled=true
+  echo "telegram_enabled=true" >> "$config_file"
 else
-  echo ""
-  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
-  then
-    telegram_enabled=true
-    echo "telegram_enabled=true" >> "$config_file"
-  else
-    telegram_enabled=false
-    echo "telegram_enabled=false" >> "$config_file"
-  fi
+  telegram_enabled=false
+  echo "telegram_enabled=false" >> "$config_file"
 fi
 if $telegram_enabled
 then
@@ -221,25 +261,6 @@ then
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo ""
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
-fi
-
-#----------------------------------------------------------------------------------------------------#
-# CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
-#----------------------------------------------------------------------------------------------------#
-
-if [ ! -f "$remchain_unregprod_script_path" ]
-then
-cat > "$remchain_unregprod_script_path" << 'DOC'
-#!/usr/bin/env bash
-
-#----------------------------------------------------------------------------------------------------#
-# UNREGISTER AS A BLOCK PRODUCER                                                                     #
-#----------------------------------------------------------------------------------------------------#
-
-remcli wallet unlock --password $walletpass > /dev/null 2>&1
-output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
-DOC
-  chmod u+x "$remchain_unregprod_script_path"
 fi
 
 #****************************************************************************************************#
@@ -291,27 +312,25 @@ function check_produce_minutes() {
 # MAIN PART OF THE SCRIPT                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-  if [ ! -f "/root/check_unregprod" ]
+  if grep -q "true" "$check_unregprod_script_path"
   then
-    cat << EOF > "/root/check_unregprod"
-true
-EOF
-  else
-    if grep "true" "/root/check_unregprod"
+    unregprod=true
+  fi
+  if [ "$unregprod" == "true" ]
+  then
+    last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    if [ -z "$last_block_date" ]
     then
-      last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-      if [ -z "$last_block_date" ]
-      then
-        last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-      fi
+      last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    fi
       last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
       config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
-      if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
-      then
-        check_produce_minutes
-      fi
+    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+    then
+      check_produce_minutes
     fi
   fi
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)                            #
