@@ -312,10 +312,7 @@ function check_produce_minutes() {
 # MAIN PART OF THE SCRIPT                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-  if grep -q "true" "$check_unregprod_script_path"
-  then
-    unregprod=true
-  fi
+  unregprod=$(cat "$check_unregprod_script_path")
   if [ "$unregprod" == "true" ]
   then
     last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
