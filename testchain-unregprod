@@ -318,15 +318,19 @@ function check_produce_minutes() {
     last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
     last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
     config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
+    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+    then
+      check_produce_minutes
+    fi
   elif [ -z "$last_block_date" ]
   then
     last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
     last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
     config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
-  fi
-  if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
-  then
-    check_produce_minutes
+    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+    then
+      check_produce_minutes
+    fi
   fi
 fi
 
