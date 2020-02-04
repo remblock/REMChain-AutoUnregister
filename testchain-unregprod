@@ -326,7 +326,7 @@ function check_produce_minutes() {
     then
       check_produce_minutes
     fi
-  fi
+  #fi
 #fi
 
 #----------------------------------------------------------------------------------------------------#
