@@ -95,7 +95,7 @@ fi
 if [ ! -f "$check_unregprod_script_path" ]
 then
 cat > "$check_unregprod_script_path" << 'DOC'
-true 
+true
 DOC
 
 #----------------------------------------------------------------------------------------------------#
@@ -138,7 +138,7 @@ then
 elif [ -z "$accountname" && -z "$global_value" ]
 then
   echo ""
-  read -p "ENTER YOUR PRODUCER NAME: " -e accountname  
+  read -p "ENTER YOUR PRODUCER NAME: " -e accountname
   echo "accountname=$accountname" >> "$config_file"
 fi
 
