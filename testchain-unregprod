@@ -303,7 +303,7 @@ function check_produce_minutes() {
       export producerpermission
       bash "$testchain_unregprod_script_path" &>/dev/null
       telegram_message="Testchain-Unregprod script has executed"
-      send_message=true
+      curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
     fi
   fi
 }
@@ -332,13 +332,4 @@ function check_produce_minutes() {
       check_produce_minutes
     fi
   fi
-fi
-
-#----------------------------------------------------------------------------------------------------#
-# SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)                            #
-#----------------------------------------------------------------------------------------------------#
-
-if $send_message
-then
-  curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
 fi
