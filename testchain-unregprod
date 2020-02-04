@@ -327,7 +327,7 @@ function check_produce_minutes() {
       check_produce_minutes
     fi
   fi
-fi
+#fi
 
 #----------------------------------------------------------------------------------------------------#
 # SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)                            #
