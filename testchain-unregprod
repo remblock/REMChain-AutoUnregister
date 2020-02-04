@@ -38,17 +38,6 @@ then
 fi
 
 #----------------------------------------------------------------------------------------------------#
-# CREATE CONFIG FILE IF IT DOESN'T EXIST                                                             #
-#----------------------------------------------------------------------------------------------------#
-
-if [ ! -f "$config_file" ]
-then
-  echo "#Configuration file for the unregprod script" > "$config_file"
-  echo "#Make the entries as variable=value" >> "$config_file"
-  echo " " >> "$config_file"
-fi
-
-#----------------------------------------------------------------------------------------------------#
 # INSTALL CRONTAB LINE IF IT DOESN'T EXIST                                                           #
 #----------------------------------------------------------------------------------------------------#
 
@@ -87,6 +76,17 @@ function get_config_value() {
     return 0
   fi
 }
+
+#----------------------------------------------------------------------------------------------------#
+# CREATE CONFIG FILE IF IT DOESN'T EXIST                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -f "$config_file" ]
+then
+  echo "#Configuration file for the unregprod script" > "$config_file"
+  echo "#Make the entries as variable=value" >> "$config_file"
+  echo " " >> "$config_file"
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
