@@ -210,11 +210,13 @@ fi
 # GET TELEGRAM DATA IF NOT ALREADY ON THE CONFIG FILE                                                #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value telegram_enabled
+if telegram_enabled
 then
-  if [ "$global_value" = "true" ]
+  if get_config_value telegram_enabled
   then
-    telegram_enabled=true
+    if [ "$global_value" = "true" ]
+    then
+      telegram_enabled=true
   elif [ -z "$global_value" ]
   then
     if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
