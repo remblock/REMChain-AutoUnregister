@@ -225,7 +225,7 @@ else
     echo "telegram_enabled=false" >> "$config_file"
   fi
 fi
-if telegram_enabled
+if $telegram_enabled
 then
   if get_config_value telegram_token
   then
