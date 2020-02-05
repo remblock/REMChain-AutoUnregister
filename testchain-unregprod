@@ -97,6 +97,7 @@ then
 cat > "$check_unregprod_script_path" << 'DOC'
 true
 DOC
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
@@ -332,4 +333,3 @@ function check_produce_minutes() {
       check_produce_minutes
     fi
   fi
-fi
