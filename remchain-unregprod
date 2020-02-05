@@ -21,7 +21,6 @@ fi
 create_dir="/root/remblock/remchain-unregprod"
 config_file="/root/remblock/remchain-unregprod/config"
 check_unregprod_script_path="/root/check-unregprod"
-remchain_unregprod_script_path="/root/remblock/remchain-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/remchain-unregprod/remchain-unregprod"
@@ -35,17 +34,6 @@ if [ ! -d "$create_dir" ]
 then
   mkdir -p "$create_dir"
   cp -p "$0" "$create_dir"
-fi
-
-#----------------------------------------------------------------------------------------------------#
-# CREATE CONFIG FILE IF IT DOESN'T EXIST                                                             #
-#----------------------------------------------------------------------------------------------------#
-
-if [ ! -f "$config_file" ]
-then
-  echo "#Configuration file for the unregprod script" > "$config_file"
-  echo "#Make the entries as variable=value" >> "$config_file"
-  echo " " >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -89,32 +77,25 @@ function get_config_value() {
 }
 
 #----------------------------------------------------------------------------------------------------#
+# CREATE CONFIG FILE IF IT DOESN'T EXIST                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -f "$config_file" ]
+then
+  echo "#Configuration file for the unregprod script" > "$config_file"
+  echo "#Make the entries as variable=value" >> "$config_file"
+  echo " " >> "$config_file"
+fi
+
+#----------------------------------------------------------------------------------------------------#
 # CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
 #----------------------------------------------------------------------------------------------------#
 
 if [ ! -f "$check_unregprod_script_path" ]
 then
 cat > "$check_unregprod_script_path" << 'DOC'
-true 
+true
 DOC
-
-#----------------------------------------------------------------------------------------------------#
-# CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
-#----------------------------------------------------------------------------------------------------#
-
-if [ ! -f "$remchain_unregprod_script_path" ]
-then
-cat > "$remchain_unregprod_script_path" << 'DOC'
-#!/usr/bin/env bash
-
-#----------------------------------------------------------------------------------------------------#
-# UNREGISTER AS A BLOCK PRODUCER                                                                     #
-#----------------------------------------------------------------------------------------------------#
-
-remcli wallet unlock --password $walletpass > /dev/null 2>&1
-output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
-DOC
-  chmod u+x "$remchain_unregprod_script_path"
 fi
 
 #****************************************************************************************************#
@@ -138,7 +119,7 @@ then
 elif [ -z "$accountname" && -z "$global_value" ]
 then
   echo ""
-  read -p "ENTER YOUR PRODUCER NAME: " -e accountname  
+  read -p "ENTER YOUR PRODUCER NAME: " -e accountname
   echo "accountname=$accountname" >> "$config_file"
 fi
 
@@ -214,17 +195,15 @@ then
   if [ "$global_value" = "true" ]
   then
     telegram_enabled=true
-  else
-    telegram_enabled=false
   fi
-fi
-if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
-then
-  telegram_enabled=true
-  echo "telegram_enabled=true" >> "$config_file"
 else
-  telegram_enabled=false
-  echo "telegram_enabled=false" >> "$config_file"
+  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
+  then
+    telegram_enabled=true
+    echo "telegram_enabled=true" >> "$config_file"
+  else
+    echo "telegram_enabled=false" >> "$config_file"
+  fi
 fi
 if $telegram_enabled
 then
@@ -233,8 +212,8 @@ then
     telegram_token="$global_value"
   elif [ -z "$global_value" ]
   then
-    echo ""
-    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+  echo ""
+  read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
   fi
   if get_config_value telegram_chatid
@@ -268,12 +247,6 @@ fi
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
-# SET TELEGRAM SEND COMMAND TO FALSE                                                                 #
-#----------------------------------------------------------------------------------------------------#
-
-send_message=false
-
-#----------------------------------------------------------------------------------------------------#
 # TRANSLATE THE TIME FORMAT FROM REMCLI FORMATE TO EPOCH TIME                                        #
 #----------------------------------------------------------------------------------------------------#
 
@@ -293,18 +266,12 @@ function check_produce_minutes() {
   then
     active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
   fi
-  if ! pgrep 'bp-unregprod' &> /dev/null
+  if [ "$active" = 1 ]
   then
-    #Execute unregister only if it's registered
-    if [ "$active" == 1 ]
-    then
-      export accountname
-      export walletpass
-      export producerpermission
-      bash "$remchain_unregprod_script_path" &>/dev/null
-      telegram_message="REMChain-Unregprod script has executed"
-      send_message=true
-    fi
+    remcli wallet unlock --password $walletpass > /dev/null 2>&1
+    output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
+    telegram_message="REMChain-Unregprod script has executed"
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
 }
 
@@ -313,27 +280,22 @@ function check_produce_minutes() {
 #----------------------------------------------------------------------------------------------------#
 
   unregprod=$(cat "$check_unregprod_script_path")
-  if [ "$unregprod" == "true" ]
+  if [ "$unregprod" = "true" ]
   then
     last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-    if [ -z "$last_block_date" ]
+    last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
+    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
-      last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+      check_produce_minutes
     fi
-      last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-      config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
+  elif [ -z "$last_block_date" ]
+  then
+    last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
       check_produce_minutes
     fi
   fi
-fi
-
-#----------------------------------------------------------------------------------------------------#
-# SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)                            #
-#----------------------------------------------------------------------------------------------------#
-
-if $send_message
-then
-  curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
-fi
