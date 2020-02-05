@@ -289,7 +289,7 @@ function check_produce_minutes() {
   if ! pgrep 'bp-unregprod' &> /dev/null
   then
     #Execute unregister only if it's registered
-    if [ "$active" = "1" ]
+    if [ "$active" = 1 ]
     then
       export accountname
       export walletpass
