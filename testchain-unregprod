@@ -21,7 +21,6 @@ fi
 create_dir="/root/remblock/testchain-unregprod"
 config_file="/root/remblock/testchain-unregprod/config"
 check_unregprod_script_path="/root/check-unregprod"
-testchain_unregprod_script_path="/root/remblock/testchain-unregprod/bp-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/testchain-unregprod/testchain-unregprod"
@@ -97,25 +96,6 @@ then
 cat > "$check_unregprod_script_path" << 'DOC'
 true
 DOC
-fi
-
-#----------------------------------------------------------------------------------------------------#
-# CREATES THE BACKUP UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
-#----------------------------------------------------------------------------------------------------#
-
-if [ ! -f "$testchain_unregprod_script_path" ]
-then
-cat > "$testchain_unregprod_script_path" << 'DOC'
-#!/usr/bin/env bash
-
-#----------------------------------------------------------------------------------------------------#
-# UNREGISTER AS A BLOCK PRODUCER                                                                     #
-#----------------------------------------------------------------------------------------------------#
-
-remcli wallet unlock --password $walletpass > /dev/null 2>&1
-output=$(remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
-DOC
-  chmod u+x "$testchain_unregprod_script_path"
 fi
 
 #****************************************************************************************************#
@@ -286,19 +266,14 @@ function check_produce_minutes() {
   then
     active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
   fi
-  if ! pgrep 'bp-unregprod' &> /dev/null
+  if [ "$active" = 1 ]
   then
-    #Execute unregister only if it's registered
-    if [ "$active" = 1 ]
-    then
-      export accountname
-      export walletpass
-      export producerpermission
-      bash "$testchain_unregprod_script_path" &>/dev/null
-      telegram_message="Testchain-Unregprod script has executed"
-      curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
-    fi
+    remcli wallet unlock --password $walletpass > /dev/null 2>&1
+    output=$(remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
+    telegram_message="Testchain-Unregprod script has executed"
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
+ fi
 }
 
 #----------------------------------------------------------------------------------------------------#
