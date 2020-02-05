@@ -217,6 +217,7 @@ then
     if [ "$global_value" = "true" ]
     then
       telegram_enabled=true
+    fi
   elif [ -z "$global_value" ]
   then
     if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
