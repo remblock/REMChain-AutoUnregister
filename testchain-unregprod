@@ -285,8 +285,8 @@ if [ -f "$state_file" ]; then
 fi
 
 case $state_file in
-    on) state_file=off ;;
-    *)  state_file=on
+    on) state_file=on ;;
+    *)  state_file=off
 esac
 
 printf 'Current state is "%s"\n' "$state_file"
