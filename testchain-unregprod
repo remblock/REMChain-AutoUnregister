@@ -20,7 +20,7 @@ fi
 
 create_dir="/root/remblock/testchain-unregprod"
 config_file="/root/remblock/testchain-unregprod/config"
-check_unregprod_script_path="/root/check-unregprod"
+state_file="/root/check-unregprod"
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/testchain-unregprod/testchain-unregprod"
@@ -280,22 +280,34 @@ function check_produce_minutes() {
 # MAIN PART OF THE SCRIPT                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-  unregprod=$(cat "$check_unregprod_script_path")
-  if [ "$unregprod" = "true" ]
+if [ -f "$state_file" ]; then
+    . "$state_file"
+fi
+
+case $state_file in
+    on) state_file=false ;;
+    *)  state_file=true
+esac
+
+printf 'Current state is "%s"\n' "$state_file"
+
+declare -p state >"$state_file"
+
+if [ "$state_file" = "true" ]
+then
+  last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+  config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
+  if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
   then
-    last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-    last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
-    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
-    then
-      check_produce_minutes
-    elif [ -z "$last_block_date" ]
-    then
+    check_produce_minutes
+  elif [ -z "$last_block_date" ]
+  then
     last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
     last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
       check_produce_minutes
     fi
-   fi
   fi
+fi
