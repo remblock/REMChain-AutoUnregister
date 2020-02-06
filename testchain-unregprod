@@ -291,8 +291,6 @@ esac
 
 printf 'Current state is "%s"\n' "$state_file"
 
-declare -p state >"$state_file"
-
 if [ "$state_file" = "on" ]
 then
   last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
