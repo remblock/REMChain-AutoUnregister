@@ -280,18 +280,16 @@ function check_produce_minutes() {
 # MAIN PART OF THE SCRIPT                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ -f "$state_file" ]; then
-    . "$state_file"
-fi
+switch=$(cat "$state_file")
 
-case $state_file in
-    on) state_file=on ;;
-    *)  state_file=off
+case $switch in
+    on) switch=on ;;
+    *)  switch=off
 esac
 
-printf 'Current state is "%s"\n' "$state_file"
+printf 'Current state is "%s"\n' "$switch"
 
-if [ "$state_file" = "on" ]
+if [ "$switch" = "on" ]
 then
   last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
