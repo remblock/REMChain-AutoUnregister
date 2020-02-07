@@ -287,7 +287,7 @@ case $switch in
     *)  switch=off
 esac
 
-printf 'Current state is "%s"\n' "$switch"
+printf 'Current state is "%s"\n\n' "$switch", to disable set "$state_file" to "off"
 
 if [ "$switch" = "on" ]
 then
