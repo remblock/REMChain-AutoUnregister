@@ -288,6 +288,7 @@ case $switch in
 esac
 
 printf 'Current state is "$switch", to disable set "$state_file" to "off"
+echo ""
 
 if [ "$switch" = "on" ]
 then
