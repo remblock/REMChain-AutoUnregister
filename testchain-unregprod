@@ -282,11 +282,6 @@ function check_produce_minutes() {
 
 switch=$(cat "$state_file")
 
-case $switch in
-    on) switch=on ;;
-    *)  switch=off
-esac
-
 echo "==============================================================================================="
 echo "Testchain-Unregprod script is '$switch', to script disable set file '$state_file' to 'off'"
 echo "==============================================================================================="
@@ -296,7 +291,7 @@ if [ "$switch" = "on" ]
 then
   last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-  config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
+  config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
   if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
   then
     check_produce_minutes
