@@ -287,7 +287,9 @@ case $switch in
     *)  switch=off
 esac
 
-echo "Testchain-Unregprod script is '$switch', to disable set '$state_file' to 'off'"
+echo "===================================================================================="
+echo "Testchain-Unregprod script is '$switch', to disable set file '$state_file' to 'off'"
+echo "===================================================================================="
 echo ""
 
 if [ "$switch" = "on" ]
