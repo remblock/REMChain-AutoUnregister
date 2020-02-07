@@ -287,17 +287,22 @@ echo "Testchain-Unregprod script is '$switch', to script disable set file '$stat
 echo "==============================================================================================="
 echo ""
 
-if [ "$switch" = "on" ]
-then
-  last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  if [ -z "$last_block_date" ]
-  then
+case "$switch" in
+
+on) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    if [ -z "$last_block_date" ]
+    then
     last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  fi
-  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-  config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
-  if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
-  then
-    check_produce_minutes
-  fi
-fi
+    fi
+    last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
+    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+    then
+      check_produce_minutes
+    fi
+    ;;
+
+off) exit
+     ;;
+
+esac
