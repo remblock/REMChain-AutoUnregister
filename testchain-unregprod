@@ -223,7 +223,6 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
     printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
-    exit 2
   fi
 fi
 
@@ -240,7 +239,6 @@ then
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo ""
   printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
-  exit 2
 fi
 
 #****************************************************************************************************#
