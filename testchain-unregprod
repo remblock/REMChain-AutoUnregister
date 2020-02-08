@@ -214,6 +214,9 @@ then
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
   fi
+fi
+if $telegram_enabled
+then
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
