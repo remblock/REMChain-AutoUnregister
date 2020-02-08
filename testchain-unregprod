@@ -113,13 +113,13 @@ then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
   if [ ! -z "$accountname" ]
   then
-    printf -- "%s" "accountname=$accountname" >> "$config_file"
+    printf -- "%s\n" "accountname=$accountname" >> "$config_file"
   fi
 elif [ -z "$accountname" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
-  printf -- "%s" "accountname=$accountname" >> "$config_file"
+  printf -- "%s\n" "accountname=$accountname" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -134,13 +134,13 @@ then
   walletpass=$(cat walletpass)
   if [ ! -z "$walletpass" ]
   then
-    printf -- "%s" "walletpass=$walletpass" >> "$config_file"
+    printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
   fi
 elif [ -z "$walletpass" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
-  printf -- "%s" "walletpass=$walletpass" >> "$config_file"
+  printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -155,13 +155,13 @@ then
   activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
   if [ ! -z "$activeproducerpublickey" ]
   then
-    printf -- "%s" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+    printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
   fi
 elif [ -z "$activeproducerpublickey" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
-  printf -- "%s" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -176,13 +176,13 @@ then
   producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
   if [ ! -z "$producerpermission" ]
   then
-    printf -- "%s" "producerpermission=$producerpermission" >> "$config_file"
+    printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
   fi
 elif [ -z "$producerpermission" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-  printf -- "%s" "producerpermission=$producerpermission" >> "$config_file"
+  printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -197,10 +197,10 @@ then
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
-    printf -- "%s" "telegram_enabled=true" >> "$config_file"
+    printf -- "%s\n" "telegram_enabled=true" >> "$config_file"
   else
     telegram_enabled=false
-    printf -- "%s" "telegram_enabled=false" >> "$config_file"
+    printf -- "%s\n" "telegram_enabled=false" >> "$config_file"
   fi
 fi
 if $telegram_enabled
@@ -212,7 +212,7 @@ then
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-    printf -- "%s" "telegram_token=$telegram_token" >> "$config_file"
+    printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
   fi
   if get_config_value telegram_chatid
   then
@@ -221,7 +221,7 @@ then
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-    printf -- "%s" "telegram_chatid=$telegram_chatid" >> "$config_file"
+    printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
   fi
 fi
 
