@@ -298,4 +298,7 @@ on) last_block_date=$(remcli -u https://remchain.remme.io get table rem rem prod
 off) exit
      ;;
 
+*) exit
+   ;;
+
 esac
