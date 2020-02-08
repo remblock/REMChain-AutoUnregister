@@ -203,7 +203,7 @@ then
     printf -- "%s\n" "telegram_enabled=false" >> "$config_file"
   fi
 fi
-if [ $telegram_enabled -eq "true" ]
+if $telegram_enabled
 then
   if get_config_value telegram_token
   then
