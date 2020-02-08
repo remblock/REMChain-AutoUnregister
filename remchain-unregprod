@@ -234,8 +234,7 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-fi
-if [ -z "$check_last_block_minutes" ]
+elif [ -z "$global_value" ]
 then
   echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
