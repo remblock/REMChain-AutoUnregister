@@ -20,8 +20,7 @@ fi
 
 create_dir="/root/remblock/remchain-unregprod"
 config_file="/root/remblock/remchain-unregprod/config"
-check_unregprod_script_path="/root/check-unregprod"
-#PATH to used commands
+state_file="/root/check-unregprod"
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/remchain-unregprod/remchain-unregprod"
 now_epoch="$(date +%s)"
@@ -91,10 +90,10 @@ fi
 # CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -f "$check_unregprod_script_path" ]
+if [ ! -f "$state_file" ]
 then
-cat > "$check_unregprod_script_path" << 'DOC'
-true
+cat > "$state_file" << 'DOC'
+on
 DOC
 fi
 
@@ -211,16 +210,18 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  elif [ -z "$global_value" ]
+  fi
+  if get_config_value telegram_chatid
+  then
+    telegram_chatid="$global_value"
+  fi
+  if [ -z "$telegram_token" ]
   then
   echo ""
   read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
   fi
-  if get_config_value telegram_chatid
-  then
-    telegram_chatid="$global_value"
-  elif [ -z "$global_value" ]
+  if [ -z "$telegram_chatid" ]
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
@@ -235,7 +236,8 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-elif [ -z "$global_value" ]
+fi
+if [ -z "$check_last_block_minutes" ]
 then
   echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
@@ -257,45 +259,43 @@ function remnodelogtime_to_epoch() {
 }
 
 #----------------------------------------------------------------------------------------------------#
-# FUNCTION THAT CHECKS WHETHER THE NODE HAS ACTUAL PRODUCED A BLOCK WITHIN THE CONFIGURED MINUTES    #
-#----------------------------------------------------------------------------------------------------#
-
-function check_produce_minutes() {
-  #Check if the recover script is already running before starting it again
-  active=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
-  if [ -z "$active" ]
-  then
-    active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  fi
-  if [ "$active" = 1 ]
-  then
-    remcli wallet unlock --password $walletpass > /dev/null 2>&1
-    output=$(remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission)
-    telegram_message="REMChain-Unregprod script has executed"
-    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
-  fi
-}
-
-#----------------------------------------------------------------------------------------------------#
 # MAIN PART OF THE SCRIPT                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-  unregprod=$(cat "$check_unregprod_script_path")
-  if [ "$unregprod" = "true" ]
-  then
-    last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-    last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) - 60 ))
-    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+switch=$(cat "$state_file")
+
+echo "==============================================================================================="
+echo "REMChain-Unregprod script is '$switch', to script disable set file '$state_file' to 'off'"
+echo "==============================================================================================="
+echo ""
+
+case "$switch" in
+
+on) last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    active=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
+    if [ -z "$active" ]
     then
-      check_produce_minutes
-    elif [ -z "$last_block_date" ]
+      active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    fi
+    if [ -z "$last_block_date" ]
     then
     last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    fi
     last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
-      check_produce_minutes
+      if [ "$active" = "1" ]
+      then
+        remcli wallet unlock --password $walletpass > /dev/null 2>&1
+        remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
+        telegram_message="REMChain-Unregprod script has executed"
+        curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
+      fi
     fi
-   fi
-  fi
+    ;;
+
+off) exit
+     ;;
+
+esac
