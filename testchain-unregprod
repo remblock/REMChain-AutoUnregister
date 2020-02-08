@@ -203,7 +203,7 @@ then
     printf -- "%s\n" "telegram_enabled=false" >> "$config_file"
   fi
 fi
-if $telegram_enabled
+if [ "$telegram_enabled" -eq "true" ]
 then
   if get_config_value telegram_token
   then
@@ -213,7 +213,6 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
-    exit 2
   fi
   if get_config_value telegram_chatid
   then
@@ -281,7 +280,7 @@ on) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem pro
     config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
-      if [ "$active" = "1" ]
+      if [ "$active" -eq "1" ]
       then
         remcli wallet unlock --password $walletpass > /dev/null 2>&1
         remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
