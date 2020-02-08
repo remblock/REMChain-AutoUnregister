@@ -237,7 +237,7 @@ then
   echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo ""
-  printf -- "%s" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
 fi
 
 #****************************************************************************************************#
