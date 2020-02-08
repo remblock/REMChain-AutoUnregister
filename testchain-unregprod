@@ -265,7 +265,7 @@ function remnodelogtime_to_epoch() {
 switch=$(cat "$state_file")
 
 echo "==============================================================================================="
-echo "Testchain-Unregprod script is '$switch', to script disable set file '$state_file' to 'off'"
+echo "Testchain-Unregprod script is '$switch', to disable script set file '$state_file' to 'off'"
 echo "==============================================================================================="
 echo ""
 
