@@ -24,4 +24,4 @@ nano remblock/remchain-unregprod/config
 nano /root/check_unregprod
 ```
 
-#### Edit file to "true" to enable and "false" to disable
+#### Edit file to "on" to enable and "off" to disable
