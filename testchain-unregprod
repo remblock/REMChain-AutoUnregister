@@ -115,7 +115,7 @@ then
   then
     printf -- "%s\n" "accountname=$accountname" >> "$config_file"
   fi
-elif [ -z "$accountname" ]
+elif [ -z "$accountname" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
@@ -136,7 +136,7 @@ then
   then
     printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
   fi
-elif [ -z "$walletpass" ]
+elif [ -z "$walletpass" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
@@ -157,7 +157,7 @@ then
   then
     printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
   fi
-elif [ -z "$activeproducerpublickey" ]
+elif [ -z "$activeproducerpublickey" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
@@ -178,7 +178,7 @@ then
   then
     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
   fi
-elif [ -z "$producerpermission" ]
+elif [ -z "$producerpermission" && -z "$global_value" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
@@ -208,7 +208,7 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  elif [ -z "$telegram_token" ]
+  elif [ -z "$global_value" ]
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
@@ -220,7 +220,7 @@ then
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
-  elif [ -z "$telegram_chatid" ]
+  elif [ -z "$global_value" ]
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
@@ -235,10 +235,10 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-elif [ -z "$check_last_block_minutes" ]
+elif [ -z "$global_value" ]
 then
   echo ""
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " check_last_block_minutes
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo ""
   printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
 fi
@@ -283,7 +283,7 @@ on) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem pro
     config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
-      if [ "$active" = 1 ]
+      if [ "$active" -eq "1" ]
       then
         remcli wallet unlock --password $walletpass > /dev/null 2>&1
         remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
