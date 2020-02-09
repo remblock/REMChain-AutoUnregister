@@ -194,6 +194,7 @@ then
   telegram_enabled="$global_value"
 elif ! grep "^telegram_enabled" "$config_file"
 then
+  echo ""
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
