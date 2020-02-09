@@ -186,23 +186,26 @@ fi
 if get_config_value producerpermission
 then
   producerpermission="$global_value"
-elif [ -z "$global_value" ]
-then
-  producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
-  if [ ! -z "$producerpermission" ]
+  if [ -z "$global_value" ]
   then
-    if grep "^producerpermission" "$config_file"
+    producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+    if [ ! -z "$producerpermission" ]
     then
-      sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
-    else
+      if grep "^producerpermission" "$config_file"
+      then
+        sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
+      else
+        printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+      fi  
+    fi
+  else 
+    if ! grep "^producerpermission" "$config_file"
+    then
+      echo ""
+      read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
       printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
     fi
   fi
-elif grep "^producerpermission" "$config_file"
-then
-  echo ""
-  read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-  printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
