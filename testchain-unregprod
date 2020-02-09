@@ -283,7 +283,7 @@ on) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem pro
     config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
-      if [ "$active" -eq "1" ]
+      if [ "$active" = 1 ]
       then
         remcli wallet unlock --password $walletpass > /dev/null 2>&1
         remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
