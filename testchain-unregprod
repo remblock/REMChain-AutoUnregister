@@ -69,9 +69,9 @@ function get_config_value() {
   global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
   if [ -z "$global_value" ]
   then
-    flag="found"
-  else
     flag="notfound"
+  else
+    flag="found"
   fi
 }
 
