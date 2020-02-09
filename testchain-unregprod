@@ -108,13 +108,12 @@ fi
 if get_config_value accountname
 then
   accountname="$global_value"
-  accountname=$(cat accountname)
-  if [ ! "$(grep "^accountname" "$config_file")" ]
-  then
-    printf -- "%s\n" "accountname=$accountname" >> "$config_file"
-  else
-    sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
-  fi
+else
+  accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
+  printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+fi
+if grep "^accountname" "$config_file")
+then
   if [ -z "$accountname" ]
   then
     echo ""
