@@ -67,12 +67,6 @@ function get_user_answer_yn(){
 
 function get_config_value() {
   global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
-  if [ -z "$global_value" ]
-  then
-    flag="notfound"
-  else
-    flag="found"
-  fi
 }
 
 #----------------------------------------------------------------------------------------------------#
@@ -108,14 +102,14 @@ fi
 if get_config_value accountname
 then
   accountname="$global_value"
-elif [ "$flag" = "notfound" ]
+elif [ -z "$global_value" ]
 then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
-  if [ "$flag" = "found" ]
+  if [ ! -z "$global_value" ]
   then
     printf -- "%s\n" "accountname=$accountname" >> "$config_file"
   fi
-elif [ -z "$accountname" && "$flag" = "notfound" ]
+elif [ -z "$accountname" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
@@ -129,14 +123,14 @@ fi
 if get_config_value walletpass
 then
   walletpass="$global_value"
-elif [ flag = "notfound" ]
+elif [ -z "$global_value" ]
 then
   walletpass=$(cat walletpass)
-  if [ flag = "found" ]
+  if [ ! -z "$global_value" ]
   then
     printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
   fi
-elif [ -z "$walletpass" && flag = "notfound" ]
+elif [ -z "$walletpass" ]
 then
   echo ""
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
@@ -150,14 +144,14 @@ fi
 if get_config_value activeproducerpublickey
 then
   activeproducerpublickey="$global_value"
-elif [ flag = "notfound" ]
+elif [ -z "$global_value" ]
 then
   activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  if [flag = "found" ]
+  if [ ! -z "$global_value" ]
   then
     printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
   fi
-elif [ -z "$activeproducerpublickey" && flag = "notfound" ]
+elif [ -z "$activeproducerpublickey" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
@@ -171,14 +165,14 @@ fi
 if get_config_value producerpermission
 then
   producerpermission="$global_value"
-elif [ flag = "notfound" ]
+elif [ -z "$global_value" ]
 then
   producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
-  if [ flag = "found" ]
+  if [ ! -z "$global_value" ]
   then
     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
   fi
-elif [ -z "$producerpermission" && flag = "notfound" ]
+elif [ -z "$producerpermission" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
@@ -192,7 +186,7 @@ fi
 if get_config_value telegram_enabled
 then
   telegram_enabled="$global_value"
-elif [ flag = "notfound" ]
+elif [ -z "$global_value" ]
 then
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
@@ -208,7 +202,7 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  elif [ flag = "notfound" ]
+  elif [ -z "$global_value" ]
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
@@ -220,7 +214,7 @@ then
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
-  elif [ flag = "notfound" ]
+  elif [ -z "$global_value" ]
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
@@ -235,7 +229,7 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-elif [ flag = "notfound" ]
+elif [ -z "$global_value" ]
 then
   echo ""
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
