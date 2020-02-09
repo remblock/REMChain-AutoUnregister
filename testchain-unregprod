@@ -124,7 +124,7 @@ elif ! grep "^accountname" "$config_file"
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
-  printf -- "%s\n" "accountname=$accountname" >> "$config_file"  
+  printf -- "%s\n" "accountname=$accountname" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
