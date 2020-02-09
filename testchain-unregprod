@@ -198,12 +198,13 @@ then
         printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
       fi
     fi
-   if [ -z "$producerpermission" ]
-   then
-     echo ""
-     read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
-   fi
+    if [ -z "$producerpermission" ]
+    then
+      echo ""
+      read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
+      printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+    fi
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
