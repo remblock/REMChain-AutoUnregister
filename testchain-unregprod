@@ -192,19 +192,15 @@ fi
 if get_config_value telegram_enabled
 then
   telegram_enabled="$global_value"
-else
-  if grep "^telegram_enabled" "$config_file"
+elif ! grep "^telegram_enabled" "$config_file"
+then
+  if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
-    sed -i "s/telegram_enabled=/telegram_enabled=$telegram_enabled/g" "$config_file"
+    telegram_enabled=true
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
   else
-    if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
-    then
-      telegram_enabled=true
-      printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
-    else
-      telegram_enabled=false
-      printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
-    fi
+    telegram_enabled=false
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
   fi
 fi
 if $telegram_enabled
@@ -212,13 +208,11 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  else
-    if grep "^telegram_token" "$config_file"
-    then
-      echo ""
-      read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-      printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
-    fi
+  elif grep "^telegram_token" "$config_file"
+  then
+    echo ""
+    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+    printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
   fi
 fi
 if $telegram_enabled
@@ -226,13 +220,11 @@ then
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
-  else
-    if grep "^telegram_chatid" "$config_file"
-    then
-      echo ""
-      read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-      printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
-    fi
+  elif ! grep "^telegram_chatid" "$config_file"
+  then
+    echo ""
+    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+    printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
   fi
 fi
 
