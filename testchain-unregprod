@@ -196,9 +196,9 @@ then
         sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
       else
         printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
-      fi  
+      fi
     fi
-  else 
+  else
     if [ -z "$producerpermission" ]
     then
       if ! grep "^producerpermission" "$config_file"
