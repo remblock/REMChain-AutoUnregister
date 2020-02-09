@@ -199,7 +199,7 @@ then
       fi  
     fi
   else 
-    if ! grep "^producerpermission" "$config_file"
+    if grep "^producerpermission" "$config_file"
     then
       echo ""
       read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
