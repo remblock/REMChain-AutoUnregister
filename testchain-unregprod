@@ -108,49 +108,41 @@ fi
 if get_config_value accountname
 then
   accountname="$global_value"
-elif [ -z "$global_value" ]
-then
-  accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
-  if [ ! -z "$accountname" ]
+  accountname=$(cat accountname)
+  if ! grep "^accountname" "$config_file"
   then
-    if grep "^accountname" "$config_file"
-    then
-      sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
-    else
-      printf -- "%s\n" "accountname=$accountname" >> "$config_file"
-    fi
+    printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+  else
+    sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
   fi
-elif ! grep "^accountname" "$config_file"
-then
-  echo ""
-  read -p "ENTER YOUR PRODUCER NAME: " -e accountname
-  printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+  if [ -z "$accountname" ]
+  then
+    echo ""
+    read -p "ENTER YOUR PRODUCER NAME: " -e accountname
+    sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
 # GET WALLET PASSWORD IF NOT ALREADY ON THE CONFIG FILE                                              #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value walletpass
+if get_config_value walletpassword
 then
-  walletpass="$global_value"
-elif [ -z "$global_value" ]
-then
-  walletpass=$(cat walletpass)
-  if [ ! -z "$walletpass" ]
+  walletpassword="$global_value"
+  walletpassword=$(cat walletpass)
+  if ! grep "^walletpassword" "$config_file"
   then
-    if grep "^walletpass" "$config_file"
-    then
-      sed -i "s/walletpass=/walletpass=$walletpass/g" "$config_file"
-    else
-      printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
-    fi
+    printf -- "%s\n" "walletpassword=$walletpassword" >> "$config_file"
+  else
+    sed -i "s/walletpassword=/walletpassword=$walletpassword/g" "$config_file"
   fi
-elif ! grep "^walletpass" "$config_file"
-then
-  echo ""
-  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
-  printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
+  if [ -z "$walletpassword" ]
+  then
+    echo ""
+    read -p "ENTER YOUR WALLET PASSWORD: " -e walletpassword
+    sed -i "s/walletpassword=/walletpassword=$walletpassword/g" "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -160,23 +152,19 @@ fi
 if get_config_value activeproducerpublickey
 then
   activeproducerpublickey="$global_value"
-elif [ -z "$global_value" ]
-then
   activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  if [ ! -z "$activeproducerpublickey" ]
+  if ! grep "^activeproducerpublickey" "$config_file"
   then
-    if grep "^activeproducerpublickey" "$config_file"
-    then
-      sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
-    else
-      printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
-    fi
+    printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  else
+    sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
   fi
-elif ! grep "^activeproducerpublickey" "$config_file"
-then
-  echo ""
-  read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
-  printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  if [ -z "$activeproducerpublickey" ]
+  then
+    echo ""
+    read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
+    sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -189,9 +177,9 @@ then
   producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
   if ! grep "^producerpermission" "$config_file"
   then
-    sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
-  else
     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+  else
+    sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
   fi
   if [ -z "$producerpermission" ]
   then
@@ -230,15 +218,13 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  elif [ -z "$global_value" ]
+  if ! grep "^telegram_token" "$config_file"
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-  if grep "^telegram_token" "$config_file"
-  then
-    sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
-  else
     printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
+  else
+    sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
   fi
  fi
 fi
@@ -247,15 +233,13 @@ then
   if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
-  elif [ -z "$global_value" ]
+  if ! grep "^telegram_chatid" "$config_file"
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-  if grep "^telegram_chatid" "$config_file"
-  then
-    sed -i "s/telegram_chatid=/telegram_chatid=$telegram_chatid/g" "$config_file"
-  else
     printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
+  else
+    sed -i "s/telegram_chatid=/telegram_chatid=$telegram_chatid/g" "$config_file"
   fi
  fi
 fi
@@ -267,16 +251,14 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-elif [ -z "$global_value" ]
-then
-  echo ""
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
-  echo ""
-  if grep "^check_last_block_minutes" "$config_file"
+  if ! grep "^check_last_block_minutes" "$config_file"
   then
-    sed -i "s/check_last_block_minutes=/check_last_block_minutes=$check_last_block_minutes/g" "$config_file"
-  else
+    echo ""
+    read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
+    echo ""
     printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  else
+    sed -i "s/check_last_block_minutes=/check_last_block_minutes=$check_last_block_minutes/g" "$config_file"
   fi
 fi
 
@@ -322,7 +304,7 @@ on) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem pro
     then
       if [ "$active" -eq "1" ]
       then
-        remcli wallet unlock --password $walletpass > /dev/null 2>&1
+        remcli wallet unlock --password $walletpassword > /dev/null 2>&1
         remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
         telegram_message="Testchain-Unregprod script has executed"
         curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
