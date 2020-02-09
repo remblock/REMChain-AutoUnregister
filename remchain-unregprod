@@ -113,13 +113,18 @@ then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
   if [ ! -z "$accountname" ]
   then
-    echo "accountname=$accountname" >> "$config_file"
+    if grep "^accountname" "$config_file"
+    then
+      sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
+    else
+      printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+    fi  
   fi
-elif [ -z "$accountname" && -z "$global_value" ]
+elif ! grep "^accountname" "$config_file"
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
-  echo "accountname=$accountname" >> "$config_file"
+  printf -- "%s\n" "accountname=$accountname" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -134,13 +139,18 @@ then
   walletpass=$(cat walletpass)
   if [ ! -z "$walletpass" ]
   then
-    echo "walletpass=$walletpass" >> "$config_file"
+    if grep "^walletpass" "$config_file"
+    then
+      sed -i "s/walletpass=/walletpass=$walletpass/g" "$config_file"
+    else
+      printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
+    fi  
   fi
-elif [ -z "$walletpass" && -z "$global_value" ]
+elif ! grep "^walletpass" "$config_file"
 then
   echo ""
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
-  echo "walletpass=$walletpass" >> "$config_file"
+  printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -155,13 +165,18 @@ then
   activeproducerpublickey=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
   if [ ! -z "$activeproducerpublickey" ]
   then
-    echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+    if grep "^activeproducerpublickey" "$config_file"
+    then
+      sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
+    else
+      printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+    fi  
   fi
-elif [ -z "$activeproducerpublickey" && -z "$global_value" ]
+elif ! grep "^activeproducerpublickey" "$config_file"
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
-  echo "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -176,13 +191,18 @@ then
   producerpermission=$(remcli -u https://remchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
   if [ ! -z "$producerpermission" ]
   then
-    echo "producerpermission=$producerpermission" >> "$config_file"
+    if grep "^producerpermission" "$config_file"
+    then
+      sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
+    else
+      printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+    fi  
   fi
-elif [ -z "$producerpermission" && -z "$global_value" ]
+elif ! grep "^producerpermission" "$config_file"
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-  echo "producerpermission=$producerpermission" >> "$config_file"
+  printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -197,32 +217,51 @@ then
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
-    echo "telegram_enabled=true" >> "$config_file"
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
   else
     telegram_enabled=false
-    echo "telegram_enabled=false" >> "$config_file"
-  fi
-  if $telegram_enabled
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
+  if grep "^telegram_enabled" "$config_file"
   then
-    if get_config_value telegram_token
-    then
-      telegram_token="$global_value"
-    elif [ -z "$global_value" ]
-    then
-      echo ""
-      read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-      echo "telegram_token=$telegram_token" >> "$config_file"
-    fi
-    if get_config_value telegram_chatid
-    then
-      telegram_chatid="$global_value"
-    elif [ -z "$global_value" ]
-    then
-      echo ""
-      read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
-      echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-    fi
-  fi
+    sed -i "s/telegram_enabled=/telegram_enabled=$telegram_enabled/g" "$config_file"
+  else
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
+  fi     
+ fi
+fi
+if $telegram_enabled
+then
+  if get_config_value telegram_token
+  then
+    telegram_token="$global_value"
+  elif [ -z "$global_value" ]
+  then
+    echo ""
+    read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+  if grep "^telegram_token" "$config_file"
+  then
+    sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
+  else
+    printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
+  fi   
+ fi
+fi
+if $telegram_enabled
+then
+  if get_config_value telegram_chatid
+  then
+    telegram_chatid="$global_value"
+  elif [ -z "$global_value" ]
+  then
+    echo ""
+    read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+  if grep "^telegram_chatid" "$config_file"
+  then
+    sed -i "s/telegram_chatid=/telegram_chatid=$telegram_chatid/g" "$config_file"
+  else
+    printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
+  fi    
+ fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -235,9 +274,14 @@ then
 elif [ -z "$global_value" ]
 then
   echo ""
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " check_last_block_minutes
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo ""
-  echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  if grep "^check_last_block_minutes" "$config_file"
+  then
+    sed -i "s/check_last_block_minutes=/check_last_block_minutes=$check_last_block_minutes/g" "$config_file"
+  else
+    printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  fi  
 fi
 
 #****************************************************************************************************#
@@ -280,7 +324,7 @@ on) last_block_date=$(remcli -u https://remchain.remme.io get table rem rem prod
     config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
     if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
     then
-      if [ "$active" = "1" ]
+      if [ "$active" -eq "1" ]
       then
         remcli wallet unlock --password $walletpass > /dev/null 2>&1
         remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
