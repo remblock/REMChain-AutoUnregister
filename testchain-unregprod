@@ -201,12 +201,9 @@ then
   else
     if [ -z "$producerpermission" ]
     then
-      if ! grep "^producerpermission" "$config_file"
-      then
-        echo ""
-        read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
-        printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
-      fi
+      echo ""
+      read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
+      printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
     fi
   fi
 fi
