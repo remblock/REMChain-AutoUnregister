@@ -235,7 +235,7 @@ then
 elif [ -z "$global_value" ]
 then
   echo ""
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " check_last_block_minutes
   echo ""
   echo "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
 fi
