@@ -233,6 +233,9 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
+else
+  check_last_block_minutes=6
+fi
 elif ! grep "^check_last_block_minutes" "$config_file"
 then
   echo ""
