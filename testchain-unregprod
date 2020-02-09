@@ -193,7 +193,7 @@ then
   then
     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
   fi
-elif [ -z "$producerpermission" ]
+elif [ -z grep "^producerpermission" "$config_file" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
