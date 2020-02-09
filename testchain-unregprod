@@ -217,8 +217,10 @@ then
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
   else
     telegram_enabled=false
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
   if grep "^telegram_enabled" "$config_file"
   then
     sed -i "s/telegram_enabled=/telegram_enabled=$telegram_enabled/g" "$config_file"
