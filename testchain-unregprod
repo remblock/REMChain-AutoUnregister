@@ -193,7 +193,7 @@ then
   else
     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
   fi
-  if [ -z "$global_value" ]
+  if [ -z "$producerpermission" ]
   then
     echo ""
     read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
