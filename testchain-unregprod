@@ -243,14 +243,12 @@ fi
 if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
-else
-  if grep "^check_last_block_minutes" "$config_file"
-  then
-    echo ""
-    read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
-    echo ""
-    printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
-  fi
+elif ! grep "^check_last_block_minutes" "$config_file"
+then
+  echo ""
+  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
+  echo ""
+  printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
 fi
 
 #****************************************************************************************************#
