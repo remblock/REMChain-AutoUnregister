@@ -108,14 +108,14 @@ fi
 if get_config_value accountname
 then
   accountname="$global_value"
-elif [ $flag = "notfound" ]
+elif [ flag = "notfound" ]
 then
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
-  if [ $flag = "found" ]
+  if [ flag = "found" ]
   then
     printf -- "%s\n" "accountname=$accountname" >> "$config_file"
   fi
-elif [ -z "$accountname" && $flag = "notfound" ]
+elif [ -z "$accountname" && flag = "notfound" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
