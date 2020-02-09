@@ -208,7 +208,7 @@ then
   if get_config_value telegram_token
   then
     telegram_token="$global_value"
-  elif grep "^telegram_token" "$config_file"
+  elif ! grep "^telegram_token" "$config_file"
   then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
