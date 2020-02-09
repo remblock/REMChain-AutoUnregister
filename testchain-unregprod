@@ -300,3 +300,54 @@ off) exit
    ;;
 
 esac
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        testscript/test.sh                                                                                  0000764 0001751 0001751 00000002440 13617715615 012432  0                                                                                                    ustar   sk                              sk                                                                                                                                                                                                                     #!/bin/bash
+
+config_file="./config_file"
+
+function get_config_value() {
+  echo "Entered get_config_value function"
+  global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
+  echo "global_value is $global_value"
+
+  if [ -z "$global_value" ]
+  then
+    echo "Returning 1"
+    return 1
+  else
+    echo "Returning 0"
+    return 0
+  fi
+
+  echo
+}
+
+echo "Contents of config_file are"
+cat $config_file
+echo 
+
+if get_config_value telegram_token
+then
+  echo "In if statement of get_config_value telegram_token"
+  echo "telegram_token before assignment is $telegram_token"
+  telegram_token="$global_value"
+  echo "telegram_token after assignment is $telegram_token"
+  echo
+elif [ -z "$global_value" ]
+then
+  echo ""
+  echo "In else statement of get_config_value telegram_token"
+  read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
+  echo "telegram_token entered is $telegram_token"
+
+  if grep "^telegram_token" "$config_file"
+  then
+	echo "telegram_token found in config_file. Replacing..."
+  	sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
+  else
+	echo "telegram_token not found in config_file. Appending..."
+  	printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
+  fi
+  echo "Contents of config_file now are:"
+  cat $config_file
+  echo
+fi
