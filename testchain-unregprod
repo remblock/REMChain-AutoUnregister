@@ -67,6 +67,12 @@ function get_user_answer_yn(){
 
 function get_config_value() {
   global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
+  if [ -z "$global_value" ]
+  then
+    return 1
+  else
+    return 0
+  fi
 }
 
 #----------------------------------------------------------------------------------------------------#
