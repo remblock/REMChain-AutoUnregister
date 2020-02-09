@@ -118,7 +118,7 @@ then
       sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
     else
       printf -- "%s\n" "accountname=$accountname" >> "$config_file"
-    fi  
+    fi
   fi
 elif ! grep "^accountname" "$config_file"
 then
@@ -144,7 +144,7 @@ then
       sed -i "s/walletpass=/walletpass=$walletpass/g" "$config_file"
     else
       printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
-    fi  
+    fi
   fi
 elif ! grep "^walletpass" "$config_file"
 then
@@ -170,7 +170,7 @@ then
       sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
     else
       printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
-    fi  
+    fi
   fi
 elif ! grep "^activeproducerpublickey" "$config_file"
 then
@@ -196,7 +196,7 @@ then
       sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
     else
       printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
-    fi  
+    fi
   fi
 elif grep "^producerpermission" "$config_file"
 then
@@ -226,7 +226,7 @@ then
     sed -i "s/telegram_enabled=/telegram_enabled=$telegram_enabled/g" "$config_file"
   else
     printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
-  fi     
+  fi
  fi
 fi
 if $telegram_enabled
@@ -243,7 +243,7 @@ then
     sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
   else
     printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
-  fi   
+  fi
  fi
 fi
 if $telegram_enabled
@@ -260,7 +260,7 @@ then
     sed -i "s/telegram_chatid=/telegram_chatid=$telegram_chatid/g" "$config_file"
   else
     printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
-  fi    
+  fi
  fi
 fi
 
@@ -281,7 +281,7 @@ then
     sed -i "s/check_last_block_minutes=/check_last_block_minutes=$check_last_block_minutes/g" "$config_file"
   else
     printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
-  fi  
+  fi
 fi
 
 #****************************************************************************************************#
