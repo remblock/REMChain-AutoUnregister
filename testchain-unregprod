@@ -112,7 +112,7 @@ else
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
   printf -- "%s\n" "accountname=$accountname" >> "$config_file"
 fi
-if grep "^accountname" "$config_file")
+if grep "^accountname" "$config_file"
 then
   if [ -z "$accountname" ]
   then
