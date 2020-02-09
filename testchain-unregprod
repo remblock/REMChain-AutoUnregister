@@ -115,11 +115,17 @@ then
   then
     printf -- "%s\n" "accountname=$accountname" >> "$config_file"
   fi
-elif [ -z "$accountname" && -z "$global_value" ]
+elif [ -z "$accountname" ]
 then
   echo ""
   read -p "ENTER YOUR PRODUCER NAME: " -e accountname
   printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+  if grep "^accountname" "$config_file"
+  then
+    sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
+  else
+    printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -136,11 +142,17 @@ then
   then
     printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
   fi
-elif [ -z "$walletpass" && -z "$global_value" ]
+elif [ -z "$walletpass" ]
 then
   echo ""
   read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
   printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
+  if grep "^walletpass" "$config_file"
+  then
+    sed -i "s/walletpass=/walletpass=$walletpass/g" "$config_file"
+  else
+    printf -- "%s\n" "walletpass=$walletpass" >> "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -162,6 +174,12 @@ then
   echo ""
   read -p "ENTER YOUR PRODUCER PUBLIC KEY: " -e activeproducerpublickey
   printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  if grep "^activeproducerpublickey" "$config_file"
+  then
+    sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
+  else
+    printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -183,6 +201,12 @@ then
   echo ""
   read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
   printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+  if grep "^producerpermission" "$config_file"
+  then
+    sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
+  else
+    printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+  fi  
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -201,7 +225,13 @@ then
   else
     telegram_enabled=false
     printf -- "%s\n" "telegram_enabled=false" >> "$config_file"
-  fi
+  if grep "^telegram_enabled" "$config_file"
+  then
+    sed -i "s/telegram_enabled=/telegram_enabled=$telegram_enabled/g" "$config_file"
+  else
+    printf -- "%s\n" "telegram_enabled=$telegram_enabled" >> "$config_file"
+  fi     
+ fi
 fi
 if $telegram_enabled
 then
@@ -213,7 +243,13 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
     printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
-  fi
+  if grep "^telegram_token" "$config_file"
+  then
+    sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
+  else
+    printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
+  fi   
+ fi
 fi
 if $telegram_enabled
 then
@@ -225,7 +261,13 @@ then
     echo ""
     read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
     printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
-  fi
+  if grep "^telegram_chatid" "$config_file"
+  then
+    sed -i "s/telegram_chatid=/telegram_chatid=$telegram_chatid/g" "$config_file"
+  else
+    printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
+  fi    
+ fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -241,6 +283,12 @@ then
   read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
   echo ""
   printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  if grep "^check_last_block_minutes" "$config_file"
+  then
+    sed -i "s/check_last_block_minutes=/check_last_block_minutes=$check_last_block_minutes/g" "$config_file"
+  else
+    printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  fi  
 fi
 
 #****************************************************************************************************#
@@ -300,54 +348,3 @@ off) exit
    ;;
 
 esac
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        testscript/test.sh                                                                                  0000764 0001751 0001751 00000002440 13617715615 012432  0                                                                                                    ustar   sk                              sk                                                                                                                                                                                                                     #!/bin/bash
-
-config_file="./config_file"
-
-function get_config_value() {
-  echo "Entered get_config_value function"
-  global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
-  echo "global_value is $global_value"
-
-  if [ -z "$global_value" ]
-  then
-    echo "Returning 1"
-    return 1
-  else
-    echo "Returning 0"
-    return 0
-  fi
-
-  echo
-}
-
-echo "Contents of config_file are"
-cat $config_file
-echo 
-
-if get_config_value telegram_token
-then
-  echo "In if statement of get_config_value telegram_token"
-  echo "telegram_token before assignment is $telegram_token"
-  telegram_token="$global_value"
-  echo "telegram_token after assignment is $telegram_token"
-  echo
-elif [ -z "$global_value" ]
-then
-  echo ""
-  echo "In else statement of get_config_value telegram_token"
-  read -p "ENTER YOUR TELEGRAM TOKEN API: " -e telegram_token
-  echo "telegram_token entered is $telegram_token"
-
-  if grep "^telegram_token" "$config_file"
-  then
-	echo "telegram_token found in config_file. Replacing..."
-  	sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
-  else
-	echo "telegram_token not found in config_file. Appending..."
-  	printf -- "%s\n" "telegram_token=$telegram_token" >> "$config_file"
-  fi
-  echo "Contents of config_file now are:"
-  cat $config_file
-  echo
-fi
