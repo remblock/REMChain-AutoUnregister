@@ -88,7 +88,7 @@ then
 fi
 
 #----------------------------------------------------------------------------------------------------#
-# CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                            #
+# CREATES THE CHECK UNREGPROD SCRIPT IF IT DOESN'T EXIST                                             #
 #----------------------------------------------------------------------------------------------------#
 
 if [ ! -f "$state_file" ]
