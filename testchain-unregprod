@@ -26,6 +26,15 @@ cron_cmd="/root/remblock/testchain-unregprod/testchain-unregprod"
 now_epoch="$(date +%s)"
 
 #----------------------------------------------------------------------------------------------------#
+# REMOVE EXISTING CRONTAB LINE IF IT EXIST WHILE CONFIG DOESN'T                                      #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -f "$config_file" ]
+then
+crontab -u root -l | grep -v ^# | grep -v "$cron_cmd" | crontab -u root -
+fi
+
+#----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
