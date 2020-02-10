@@ -182,6 +182,7 @@ then
     echo ""
     read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
     sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
+    echo ""
   fi
 fi
 
@@ -194,7 +195,6 @@ then
   telegram_enabled="$global_value"
 elif ! grep "^telegram_enabled" "$config_file" > /dev/null 2>&1
 then
-  echo ""
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
   then
     telegram_enabled=true
