@@ -112,7 +112,7 @@ else
   accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
   printf -- "%s\n" "accountname=$accountname" >> "$config_file"
 fi
-if grep "^accountname" "$config_file"
+if grep "^accountname" "$config_file" > /dev/null 2>&1
 then
   if [ -z "$accountname" ]
   then
@@ -133,7 +133,7 @@ else
   walletpassword=$(cat walletpass)
   printf -- "%s\n" "walletpassword=$walletpassword" >> "$config_file"
 fi
-if grep "^walletpassword" "$config_file"
+if grep "^walletpassword" "$config_file" > /dev/null 2>&1
 then
   if [ -z "$walletpassword" ]
   then
@@ -154,7 +154,7 @@ else
   activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
   printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
 fi
-if grep "^activeproducerpublickey" "$config_file"
+if grep "^activeproducerpublickey" "$config_file" > /dev/null 2>&1
 then
   if [ -z "$activeproducerpublickey" ]
   then
@@ -175,7 +175,7 @@ else
   producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
   printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
 fi
-if grep "^producerpermission" "$config_file"
+if grep "^producerpermission" "$config_file" > /dev/null 2>&1
 then
   if [ -z "$producerpermission" ]
   then
@@ -192,7 +192,7 @@ fi
 if get_config_value telegram_enabled
 then
   telegram_enabled="$global_value"
-elif ! grep "^telegram_enabled" "$config_file"
+elif ! grep "^telegram_enabled" "$config_file" > /dev/null 2>&1
 then
   echo ""
   if get_user_answer_yn "ENABLE TELEGRAM NOTIFICATIONS"
