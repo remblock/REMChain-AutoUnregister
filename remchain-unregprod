@@ -136,8 +136,14 @@ if get_config_value walletpassword
 then
   walletpassword="$global_value"
 else
-  walletpassword=$(cat walletpass)
-  printf -- "%s\n" "walletpassword=$walletpassword" >> "$config_file"
+  if ! grep "^walletpassword" "$config_file" > /dev/null 2>&1
+  then
+    walletpassword=$(cat walletpass)
+    printf -- "%s\n" "walletpassword=$walletpassword" >> "$config_file"
+  else
+    walletpassword=$(cat walletpass)
+    sed -i "s/walletpassword=/walletpassword=$walletpassword/g" "$config_file"
+  fi
 fi
 if grep "^walletpassword" "$config_file" > /dev/null 2>&1
 then
