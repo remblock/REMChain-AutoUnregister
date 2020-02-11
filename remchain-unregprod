@@ -109,8 +109,14 @@ if get_config_value accountname
 then
   accountname="$global_value"
 else
-  accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
-  printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+  if ! grep "^accountname" "$config_file" > /dev/null 2>&1
+  then
+    accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
+    printf -- "%s\n" "accountname=$accountname" >> "$config_file"
+  else
+    accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
+    sed -i "s/accountname=/accountname=$accountname/g" "$config_file"
+  fi
 fi
 if grep "^accountname" "$config_file" > /dev/null 2>&1
 then
