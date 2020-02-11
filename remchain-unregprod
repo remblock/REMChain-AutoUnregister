@@ -163,8 +163,14 @@ if get_config_value activeproducerpublickey
 then
   activeproducerpublickey="$global_value"
 else
-  activeproducerpublickey=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  if ! grep "^activeproducerpublickey" "$config_file" > /dev/null 2>&1
+  then
+    activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  else
+    activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
+  fi
 fi
 if grep "^activeproducerpublickey" "$config_file" > /dev/null 2>&1
 then
