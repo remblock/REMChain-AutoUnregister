@@ -18,12 +18,12 @@ fi
 # CONFIGURATION VARIABLES                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
+now_epoch="$(date +%s)"
+state_file="/root/check-unregprod"
 create_dir="/root/remblock/testchain-unregprod"
 config_file="/root/remblock/testchain-unregprod/config"
-state_file="/root/check-unregprod"
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/testchain-unregprod/testchain-unregprod"
-now_epoch="$(date +%s)"
 
 #----------------------------------------------------------------------------------------------------#
 # REMOVE EXISTING CRONTAB LINE IF IT EXIST WHILE CONFIG DOESN'T                                      #
