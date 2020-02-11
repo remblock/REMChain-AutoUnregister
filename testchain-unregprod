@@ -313,32 +313,32 @@ echo ""
 
 case "$switch" in
 
-on) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-    active=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
-    if [ -z "$active" ]
-    then
-      active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
-    fi
-    if [ -z "$last_block_date" ]
-    then
-    last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-    fi
-    last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-    config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
-    if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
-    then
-      if [ "$active" -eq "1" ]
-      then
-        remcli wallet unlock --password $walletpassword > /dev/null 2>&1
-        remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
-        telegram_message="Testchain-Unregprod script has executed"
-        curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
-      fi
-    fi
-    ;;
+on|On|ON) last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+          active=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
+          if [ -z "$active" ]
+          then
+            active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
+          fi
+          if [ -z "$last_block_date" ]
+          then
+            last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+          fi
+          last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+          config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
+          if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
+          then
+            if [ "$active" -eq "1" ]
+            then
+              remcli wallet unlock --password $walletpassword > /dev/null 2>&1
+              remcli -u https://testchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
+              telegram_message="Testchain-Unregprod script has executed"
+              curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
+            fi
+          fi
+        ;;
 
-off) exit
-     ;;
+off|Off|OFF) exit
+             ;;
 
 *) exit
    ;;
