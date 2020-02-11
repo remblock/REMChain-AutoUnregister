@@ -255,10 +255,16 @@ if get_config_value check_last_block_minutes
 then
   check_last_block_minutes="$global_value"
 else
-  echo ""
-  read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
-  echo ""
-  printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  if ! grep "^check_last_block_minutes" "$config_file" > /dev/null 2>&1
+  then
+    echo ""
+    read -p "ENTER MINTUES TO AUTO-UNREGISTER IF YOU'RE NOT PRODUCING?: " -e check_last_block_minutes
+    echo ""
+    printf -- "%s\n" "check_last_block_minutes=$check_last_block_minutes" >> "$config_file"
+  else
+    check_last_block_minutes=6
+    sed -i "s/check_last_block_minutes=/check_last_block_minutes=$check_last_block_minutes/g" "$config_file"
+  fi
 fi
 
 #****************************************************************************************************#
