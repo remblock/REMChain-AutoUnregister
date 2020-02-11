@@ -136,8 +136,14 @@ if get_config_value walletpassword
 then
   walletpassword="$global_value"
 else
-  walletpassword=$(cat walletpass)
-  printf -- "%s\n" "walletpassword=$walletpassword" >> "$config_file"
+  if ! grep "^walletpassword" "$config_file" > /dev/null 2>&1
+  then
+    walletpassword=$(cat walletpass)
+    printf -- "%s\n" "walletpassword=$walletpassword" >> "$config_file"
+  else
+    walletpassword=$(cat walletpass)
+    sed -i "s/walletpassword=/walletpassword=$walletpassword/g" "$config_file"
+  fi
 fi
 if grep "^walletpassword" "$config_file" > /dev/null 2>&1
 then
@@ -157,8 +163,14 @@ if get_config_value activeproducerpublickey
 then
   activeproducerpublickey="$global_value"
 else
-  activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
-  printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  if ! grep "^activeproducerpublickey" "$config_file" > /dev/null 2>&1
+  then
+    activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
+  else
+    activeproducerpublickey=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+    sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
+  fi
 fi
 if grep "^activeproducerpublickey" "$config_file" > /dev/null 2>&1
 then
@@ -178,8 +190,14 @@ if get_config_value producerpermission
 then
   producerpermission="$global_value"
 else
-  producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
-  printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+  if ! grep "^producerpermission" "$config_file" > /dev/null 2>&1
+  then
+    producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+    printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
+  else
+    producerpermission=$(remcli -u https://testchain.remme.io get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+    sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
+  fi
 fi
 if grep "^producerpermission" "$config_file" > /dev/null 2>&1
 then
