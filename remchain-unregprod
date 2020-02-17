@@ -20,10 +20,11 @@ fi
 
 now_epoch="$(date +%s)"
 state_file="/root/check-unregprod"
+remnode_log_file="/root/remnode.log"
 create_dir="/root/remblock/remchain-unregprod"
 config_file="/root/remblock/remchain-unregprod/config"
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 cron_cmd="/root/remblock/remchain-unregprod/remchain-unregprod"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 
 #----------------------------------------------------------------------------------------------------#
 # REMOVE EXISTING CRONTAB LINE IF IT EXIST WHILE CONFIG DOESN'T                                      #
@@ -206,6 +207,7 @@ then
     echo ""
     read -p "ENTER YOUR PRODUCER PERMISSION: " -e producerpermission
     sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
+    echo ""
   fi
 fi
 
@@ -312,7 +314,8 @@ echo ""
 
 case "$switch" in
 
-on|On|ON) last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+on|On|ON) last_log_block_date=$(grep -i "signed by $accountname" $remnode_log_file | sed -n '$p' | awk '{print $2}')
+          last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
           active=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
           if [ -z "$active" ]
           then
@@ -323,15 +326,19 @@ on|On|ON) last_block_date=$(remcli -u https://remchain.remme.io get table rem re
             last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
           fi
           last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
+          last_log_block_epoch=$(remnodelogtime_to_epoch "$last_log_block_date")
           config_minutes_in_seconds=$(( (check_last_block_minutes * 60) ))
           if (( ($now_epoch - $last_block_epoch) >= $config_minutes_in_seconds ))
           then
-            if [ "$active" -eq "1" ]
+            if (( ($now_epoch - $last_log_block_epoch) >= $config_minutes_in_seconds ))
             then
-              remcli wallet unlock --password $walletpassword > /dev/null 2>&1
-              remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
-              telegram_message="REMChain-Unregprod script has executed"
-              curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
+              if [ "$active" -eq "1" ]
+              then
+                remcli wallet unlock --password $walletpassword > /dev/null 2>&1
+                remcli -u https://remchain.remme.io system unregprod $accountname -x 120 -p $accountname@$producerpermission
+                telegram_message="REMChain-Unregprod script has executed"
+                curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
+              fi
             fi
           fi
         ;;
