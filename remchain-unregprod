@@ -314,7 +314,7 @@ echo ""
 
 case "$switch" in
 
-on|On|ON) last_log_block_date=$(grep -i "signed by $accountname" $remnode_log_file | sed -n '$p' | awk '{print $2}')
+on|On|ON) last_log_block_date=$(grep -i "signed by $accountname" "$remnode_log_file" | sed -n '$p' | awk '{print $2}')
           last_block_date=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
           active=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
           if [ -z "$active" ]
