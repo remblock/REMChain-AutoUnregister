@@ -254,7 +254,7 @@ then
       read -p "ENTER YOUR TELEGRAM CHAT ID: " -e telegram_chatid
       printf -- "%s\n" "telegram_chatid=$telegram_chatid" >> "$config_file"
     else
-      sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file" 
+      sed -i "s/telegram_token=/telegram_token=$telegram_token/g" "$config_file"
     fi
   fi
 fi
@@ -316,7 +316,7 @@ case "$switch" in
 
 on|On|ON) last_log_block_date=$(cat -v $remnode_log_file | grep "signed by $accountname" | sed -n '$p' | awk '{print $2}')
           last_block_date=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
-          active=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',') 
+          active=$(remcli -u https://testchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
           if [ -z "$active" ]
           then
             active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
