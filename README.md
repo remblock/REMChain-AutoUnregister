@@ -4,10 +4,18 @@
 
 ***
 
-### Setup Automated-Unregprod:
+### Setup REMChain-Unregprod:
 
 ```
 sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/remchain-unregprod && sudo chmod u+x remchain-unregprod && sudo ./remchain-unregprod
+```
+
+***
+
+### Setup Testchain-Unregprod:
+
+```
+sudo wget https://github.com/remblock/REMChain-Automated-Unregprod/raw/master/testchain-unregprod && sudo chmod u+x testchain-unregprod && sudo ./testchain-unregprod
 ```
 
 ***
