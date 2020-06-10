@@ -170,7 +170,7 @@ else
     printf -- "%s\n" "activeproducerpublickey=$activeproducerpublickey" >> "$config_file"
     if [ -z "$activeproducerpublickey" ]
     then
-      activeproducerpublickey=$(remcli -u https://remblock.info get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+      activeproducerpublickey=$(remcli -u https://remme.eosusa.news get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
       sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
       if [ -z "$activeproducerpublickey" ]
       then
@@ -183,7 +183,7 @@ else
     sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
     if [ -z "$activeproducerpublickey" ]
     then
-      activeproducerpublickey=$(remcli -u https://remblock.info get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
+      activeproducerpublickey=$(remcli -u https://remme.eosusa.news get table rem rem producers -L $accountname -U $accountname | grep 'producer_key' | awk '{print $2}' | tr -d '"' | tr -d ',')
       sed -i "s/activeproducerpublickey=/activeproducerpublickey=$activeproducerpublickey/g" "$config_file"
       if [ -z "$activeproducerpublickey" ]
       then
@@ -217,7 +217,7 @@ else
     printf -- "%s\n" "producerpermission=$producerpermission" >> "$config_file"
     if [ -z "$producerpermission" ]
     then
-      producerpermission=$(remcli -u https://remblock.info get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+      producerpermission=$(remcli -u https://remme.eosusa.news get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
       sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
       if [ -z "$producerpermission" ]
       then
@@ -230,7 +230,7 @@ else
     sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
     if [ -z "$producerpermission" ]
     then
-      producerpermission=$(remcli -u https://remblock.info get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
+      producerpermission=$(remcli -u https://remme.eosusa.news get account $accountname | grep $activeproducerpublickey | awk '{print $1}' | sed -n 1p)
       sed -i "s/producerpermission=/producerpermission=$producerpermission/g" "$config_file"
       if [ -z "$producerpermission" ]
       then
@@ -358,7 +358,7 @@ on|On|ON) last_log_block_date=$(cat -v $remnode_log_file | grep "signed by $acco
           active=$(remcli -u https://remchain.remme.io get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
           if [ -z "$active" ]
           then
-            active=$(remcli -u https://remblock.info get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
+            active=$(remcli -u https://remme.eosusa.news get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
             if [ -z "$active" ]
             then
               active=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'is_active' | awk '{print $2}' | tr -d '"' | tr -d ',')
@@ -366,7 +366,7 @@ on|On|ON) last_log_block_date=$(cat -v $remnode_log_file | grep "signed by $acco
           fi
           if [ -z "$last_block_date" ]
           then
-            last_block_date=$(remcli -u https://remblock.info get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
+            last_block_date=$(remcli -u https://remme.eosusa.news get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
             if [ -z "$last_block_date" ]
             then
               last_block_date=$(remcli get table rem rem producers -L $accountname -U $accountname | grep 'last_block_time' | awk '{print $2}' | tr -d '"' | tr -d ',')
